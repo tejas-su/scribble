@@ -39,3 +39,8 @@ Simple minimalist note taking app buit using flutter.
 ## What can you do?
 
 Feel free to use the code as you wish, fork the repo and build your own flavor or help us improve the project, totally up to you
+
+## Licences 
+
+Icons by flat icons 
+Fonts by Google fonts
