@@ -48,7 +48,7 @@ class NotesCard extends StatelessWidget {
             motion: const ScrollMotion(),
             children: [
               SlidableAction(
-                autoClose: false,
+                autoClose: true,
                 borderRadius: BorderRadius.only(
                     topRight: Radius.circular(15),
                     bottomRight: Radius.circular(15)),

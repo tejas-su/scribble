@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../themes/themes.dart';
-
 class TodoCard extends StatelessWidget {
   final String todo;
   final String date;
