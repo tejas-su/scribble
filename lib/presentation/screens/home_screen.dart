@@ -1,15 +1,14 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:scribble/models/notes.dart';
-import 'package:scribble/presentation/screens/new_notes_screen.dart';
+import '../../cubit/settings_cubit.dart';
+import '../../models/notes/notes.dart';
+import '../../models/settings/settings.dart';
 import '../../notes_bloc/notes_bloc.dart';
-import '../../utils/utils.dart';
 import '../widgets/notes_card.dart';
-import '/presentation/widgets/button.dart';
-import '/presentation/themes/themes.dart';
+import 'new_notes_screen.dart';
+import 'todo_screen.dart';
 import 'update_note_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -17,109 +16,152 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorindex = Random().nextInt(15);
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        forceMaterialTransparency: true,
+        surfaceTintColor: Theme.of(context).appBarTheme.surfaceTintColor,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         titleSpacing: 20,
-        foregroundColor: black,
-        backgroundColor: black,
         title: Text(
-          'Scribble',
-          style: GoogleFonts.merriweather(
-            color: white,
-            fontSize: 35,
+          'scribble',
+          style: GoogleFonts.inter(
+            color: Theme.of(context).textTheme.titleLarge?.color,
+            fontWeight: FontWeight.bold,
+            fontSize: 32,
           ),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 20.0, top: 8, bottom: 8),
-            child: NavButton(
-                height: 55,
-                width: 80,
-                onTap: () {
-                  context.read<NotesBloc>().add(ToggleGridViewEvent());
-                },
-                icon: Center(
-                  child: BlocBuilder<NotesBloc, NotesState>(
-                    builder: (context, state) {
-                      return Text(
-                        state is NotesLoaded && state.isGrid == 1
-                            ? 'GRID'
-                            : 'LIST',
-                        style: TextStyle(
-                            color: colors[colorindex],
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500),
-                      );
-                    },
-                  ),
-                )),
+          BlocBuilder<SettingsCubit, Settings>(
+            builder: (context, theme) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Row(
+                  children: [
+                    IconButton(
+                        onPressed: () {
+                          context
+                              .read<SettingsCubit>()
+                              .toggleTheme(!theme.isDarkMode);
+                        },
+                        icon: theme.isDarkMode
+                            ? Icon(
+                                Icons.light_mode_rounded,
+                                color: Theme.of(context).iconTheme.color,
+                              )
+                            : Icon(
+                                Icons.dark_mode_rounded,
+                                color: Theme.of(context).iconTheme.color,
+                              )),
+                    //Buton to change the view to grid or list view accordingly
+                    BlocBuilder<SettingsCubit, Settings>(
+                      builder: (context, state) {
+                        return IconButton(
+                            onPressed: () {
+                              context
+                                  .read<SettingsCubit>()
+                                  .toggleLayout(!state.isGrid);
+                            },
+                            icon: state.isGrid
+                                ? const Icon(Icons.grid_view_rounded)
+                                : const Icon(Icons.table_rows));
+                      },
+                    ),
+
+                    IconButton(
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const TodoScreen(),
+                          ));
+                        },
+                        icon: const Icon(Icons.task_alt_rounded))
+                  ],
+                ),
+              );
+            },
           ),
         ],
       ),
-      floatingActionButton: NavButton(
-          height: 55,
-          width: 55,
-          onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const NewNotesScreen(),
-              )),
-          icon: Icon(
-            Icons.add_rounded,
-            weight: 100,
-            size: 35,
-            color: colors[colorindex],
-          )),
-      backgroundColor: black,
+      floatingActionButton: FloatingActionButton(
+        elevation: 0,
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const NewNotesScreen(),
+            ),
+          );
+        },
+        backgroundColor:
+            Theme.of(context).floatingActionButtonTheme.backgroundColor,
+        child: Icon(
+          Icons.edit_rounded,
+          color: Theme.of(context).iconTheme.color,
+        ),
+      ),
       body: BlocBuilder<NotesBloc, NotesState>(
         builder: (context, state) {
-          if (state is NotesLoading) {
-            return const Center(
-                child: CircularProgressIndicator(
-              color: white,
-            ));
-          }
-          if (state is NotesLoaded) {
-            return MasonryGridView.builder(
-              padding: const EdgeInsets.all(20),
-              gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: state.isGrid),
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              itemCount: state.note.length,
-              itemBuilder: (context, index) {
-                Notes notes = state.note[index]; //index position
-                return NotesCard(
-                  onLongPress: () {
-                    context
-                        .read<NotesBloc>()
-                        .add(DeleteNotes(notes: state.note, index: index));
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text('Notes Deleted Successfully')));
-                  },
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => UpdateNotesScreen(
-                          index: index,
-                          context: context,
-                          content: notes.content,
-                          title: notes.title,
-                          date: notes.date),
-                    ));
-                  },
-                  date: notes.date,
-                  title: notes.title,
-                  content: notes.content,
-                );
-              },
-            );
-          } else {
-            return const Center(
-                child: Text(
-              'Oops something went wrong 😩',
-              style: TextStyle(fontSize: 15, color: white),
-            ));
-          }
+          return switch (state) {
+            //Loading state
+            NotesLoadingState() => Center(
+                  child: CircularProgressIndicator(
+                color: Theme.of(context).textTheme.titleLarge?.color,
+              )),
+            //Loaded state
+            NotesLoadedState() => BlocBuilder<SettingsCubit, Settings>(
+                builder: (context, layout) {
+                  return MasonryGridView.builder(
+                    gridDelegate:
+                        SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: layout.isGrid ? 2 : 1),
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    padding: const EdgeInsets.all(18),
+                    itemCount: state.note.length,
+                    itemBuilder: (context, index) {
+                      Notes notes = state.note[index]; //index position
+                      return NotesCard(
+                        onPressedSlidable: (context) {
+                          context
+                              .read<NotesBloc>()
+                              .add(DeleteNotesEvent(index: index));
+                        },
+                        onDismissed: () {
+                          context
+                              .read<NotesBloc>()
+                              .add(DeleteNotesEvent(index: index));
+                        },
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => UpdateNotesScreen(
+                              isbookMarked: state.bookMarks[index].isBookMarked,
+                              note: state.note[index],
+                              index: index,
+                            ),
+                          ));
+                        },
+                        icon: state.bookMarks[index].isBookMarked
+                            ? Icons.bookmark_rounded
+                            : null,
+                        date: notes.date,
+                        title: notes.title,
+                        content: notes.content,
+                      );
+                    },
+                  );
+                },
+              ),
+            //Error state
+            NotesErrorState() => Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Center(
+                    child: Text(
+                  state.errorMessage,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 24),
+                )),
+              )
+          };
         },
       ),
     );

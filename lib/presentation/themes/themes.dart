@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 
-const black = Color.fromRGBO(31, 30, 30, 1);
-const grey = Color.fromRGBO(52, 50, 51, 1);
-const white = Color.fromRGBO(255, 252, 249, 1);
-
-const yellowDarkShade = Color.fromRGBO(250, 204, 84, 1);
-
 final darkTheme = ThemeData(
-  scaffoldBackgroundColor: black,
-  dialogBackgroundColor: black,
+    cardColor: const Color(0xFF1c1c1c),
+    floatingActionButtonTheme:
+        const FloatingActionButtonThemeData(backgroundColor: Color(0xFF395886)),
+    colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.deepPurpleAccent, brightness: Brightness.dark),
+    useMaterial3: true,
+    brightness: Brightness.dark);
+
+final lightTheme = ThemeData(
+  scaffoldBackgroundColor: Color(0xFFFAFAFA),
+  cardColor: const Color(0xFFF7F0F0),
+  colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.deepPurpleAccent, brightness: Brightness.light),
   useMaterial3: true,
+  floatingActionButtonTheme:
+      const FloatingActionButtonThemeData(backgroundColor: Color(0xFFD5DEEF)),
+  brightness: Brightness.light,
 );

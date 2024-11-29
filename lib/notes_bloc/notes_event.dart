@@ -7,26 +7,41 @@ abstract class NotesEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class LoadNotes extends NotesEvent {}
+class LoadNotesEvent extends NotesEvent {}
 
-class AddNotes extends NotesEvent {
+class AddNotesEvent extends NotesEvent {
   final Notes notes;
 
-  const AddNotes({required this.notes});
+  const AddNotesEvent({required this.notes});
+
+  @override
+  List<Object> get props => [notes];
 }
 
-class UpdateNotes extends NotesEvent {
+class UpdateNotesEvent extends NotesEvent {
   final Notes notes;
   final int index;
 
-  const UpdateNotes({required this.notes, required this.index});
+  const UpdateNotesEvent({required this.notes, required this.index});
+
+  @override
+  List<Object> get props => [notes, index];
 }
 
-class DeleteNotes extends NotesEvent {
+class DeleteNotesEvent extends NotesEvent {
   final int index;
-  final List<Notes> notes;
 
-  const DeleteNotes({required this.notes, required this.index});
+  const DeleteNotesEvent({required this.index});
+
+  @override
+  List<Object> get props => [index];
 }
 
-class ToggleGridViewEvent extends NotesEvent {}
+class UpdateBookMarkEvent extends NotesEvent {
+  final bool isBookMarked;
+  final int index;
+
+  const UpdateBookMarkEvent({required this.isBookMarked, required this.index});
+  @override
+  List<Object> get props => [index];
+}
