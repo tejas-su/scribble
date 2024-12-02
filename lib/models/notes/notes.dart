@@ -14,10 +14,10 @@ class Notes extends Equatable {
   @HiveField(2)
   final String content;
   @HiveField(3)
-  final bool? isBookmarked;
+  final bool isBookmarked;
   @HiveField(3)
   const Notes({
-    this.isBookmarked,
+    this.isBookmarked = false,
     required this.title,
     required this.date,
     required this.content,

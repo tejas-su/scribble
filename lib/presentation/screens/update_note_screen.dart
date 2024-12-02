@@ -3,16 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../notes_bloc/notes_bloc.dart';
 import '../../models/notes/notes.dart';
-import '/utils/utils.dart';
 
 class UpdateNotesScreen extends StatelessWidget {
   final Notes note;
   final int index;
-  final bool isbookMarked;
 
   const UpdateNotesScreen({
     super.key,
-    required this.isbookMarked,
     required this.note,
     required this.index,
   });
@@ -32,22 +29,14 @@ class UpdateNotesScreen extends StatelessWidget {
         return GestureDetector(
           onTap: () {
             FocusManager.instance.primaryFocus?.unfocus();
-            final notes = Notes(
-              title: titleController.text,
-              date: date.toString(),
-              content: contentController.text,
-            );
-            context
-                .read<NotesBloc>()
-                .add(UpdateNotesEvent(notes: notes, index: index));
           },
           child: PopScope(
             onPopInvokedWithResult: (didPop, result) {
               final notes = Notes(
-                title: titleController.text,
-                date: date.toString(),
-                content: contentController.text,
-              );
+                  title: titleController.text,
+                  date: date.toString(),
+                  content: contentController.text,
+                  isBookmarked: notesLoadedState.note[index].isBookmarked);
               context
                   .read<NotesBloc>()
                   .add(UpdateNotesEvent(notes: notes, index: index));
@@ -58,10 +47,13 @@ class UpdateNotesScreen extends StatelessWidget {
                 actions: [
                   IconButton(
                     onPressed: () {
-                      context.read<NotesBloc>().add(UpdateBookMarkEvent(
-                          index: index, isBookMarked: !isbookMarked));
+                      context.read<NotesBloc>().add(UpdateNotesEvent(
+                          notes: note.copyWith(
+                              isBookmarked:
+                                  !notesLoadedState.note[index].isBookmarked),
+                          index: index));
                     },
-                    icon: notesLoadedState.bookMarks[index].isBookMarked
+                    icon: notesLoadedState.note[index].isBookmarked
                         ? Icon(Icons.bookmark_rounded)
                         : Icon(Icons.bookmark_outline_rounded),
                   )
@@ -110,7 +102,7 @@ class UpdateNotesScreen extends StatelessWidget {
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.all(20),
                         hintMaxLines: 100,
-                        hintText: hintText,
+                        hintText: 'Type something...',
                         hintStyle: TextStyle(
                             color:
                                 Theme.of(context).textTheme.titleMedium?.color,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:scribble/models/bookmarks/bookmarks.dart';
 import 'cubit/settings_cubit.dart';
 import 'models/notes/notes.dart';
 import 'models/settings/settings.dart';
@@ -20,14 +19,14 @@ void main() async {
   //Custom object for hive
   Hive.registerAdapter(NotesAdapter());
   Hive.registerAdapter(SettingsAdapter());
-  Hive.registerAdapter(BookmarksAdapter());
+
   Box notesBox = await Hive.openBox<Notes>('notes');
-  Box bookMarksBox = await Hive.openBox<Bookmarks>('bookmarks');
+
   Box settingsBox = await Hive.openBox<Settings>('settings');
 
   //For handling the initial error showing the the theme value is empty
   if (settingsBox.isEmpty) {
-    settingsBox.put(0, Settings(isGrid: true, isDarkMode: true));
+    settingsBox.put(0, Settings(isGrid: false, isDarkMode: true));
   }
   //Retrieve the value of theme and layout
   Settings settings = settingsBox.getAt(0);
@@ -36,10 +35,9 @@ void main() async {
   runApp(MultiBlocProvider(
     providers: [
       BlocProvider(
-          create: (context) => NotesBloc(
-              hiveDatabase:
-                  HiveDatabase(notesBox: notesBox, bookMarksBox: bookMarksBox))
-            ..add(LoadNotesEvent())),
+          create: (context) =>
+              NotesBloc(hiveDatabase: HiveDatabase(notesBox: notesBox))
+                ..add(LoadNotesEvent())),
       BlocProvider(
         create: (context) => SettingsCubit(
             initialLayout: initialLayout,

@@ -134,13 +134,12 @@ class HomeScreen extends StatelessWidget {
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => UpdateNotesScreen(
-                              isbookMarked: state.bookMarks[index].isBookMarked,
                               note: state.note[index],
                               index: index,
                             ),
                           ));
                         },
-                        icon: state.bookMarks[index].isBookMarked
+                        icon: state.note[index].isBookmarked
                             ? Icons.bookmark_rounded
                             : null,
                         date: notes.date,

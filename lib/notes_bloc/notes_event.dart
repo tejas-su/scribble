@@ -36,19 +36,3 @@ class DeleteNotesEvent extends NotesEvent {
   @override
   List<Object> get props => [index];
 }
-
-class UpdateBookMarkEvent extends NotesEvent {
-  final bool isBookMarked;
-  final int index;
-
-  const UpdateBookMarkEvent({required this.isBookMarked, required this.index});
-  @override
-  List<Object> get props => [index];
-}
-
-class AddBookMarkEvent extends NotesEvent {
-  final bool value;
-  const AddBookMarkEvent({required this.value});
-  @override
-  List<Object> get props => [value];
-}

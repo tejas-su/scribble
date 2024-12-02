@@ -17,7 +17,7 @@ class NotesAdapter extends TypeAdapter<Notes> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Notes(
-      isBookmarked: fields[3] as bool?,
+      isBookmarked: fields[3] as bool,
       title: fields[0] as String,
       date: fields[1] as String,
       content: fields[2] as String,

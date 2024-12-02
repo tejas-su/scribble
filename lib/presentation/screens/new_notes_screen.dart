@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../notes_bloc/notes_bloc.dart';
 import '../../models/notes/notes.dart';
-import '/utils/utils.dart';
 
 class NewNotesScreen extends StatelessWidget {
   const NewNotesScreen({
@@ -77,7 +76,7 @@ class NewNotesScreen extends StatelessWidget {
                     decoration: const InputDecoration(
                       contentPadding: EdgeInsets.all(20),
                       hintMaxLines: 100,
-                      hintText: hintText,
+                      hintText: 'Type something...',
                       hintStyle: TextStyle(fontSize: 18),
                       border: InputBorder.none,
                     ),
