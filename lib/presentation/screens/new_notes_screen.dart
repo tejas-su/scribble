@@ -37,34 +37,6 @@ class NewNotesScreen extends StatelessWidget {
               forceMaterialTransparency: true,
               surfaceTintColor: Theme.of(context).appBarTheme.surfaceTintColor,
               backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-              actions: [
-                //TODO: fix bookmark
-                IconButton(
-                    tooltip: 'Add Bookmark',
-                    onPressed: () {
-                      context.read<NotesBloc>().add(
-                          UpdateBookMarkEvent(isBookMarked: true, index: 0));
-                    },
-                    icon: Icon(Icons.bookmark_outline_rounded)),
-
-                //TODO: Add an explicit save button to save the notes on demand
-                IconButton(
-                    tooltip: 'Save note',
-                    onPressed: () {
-                      if (titleController.text.isNotEmpty ||
-                          contentController.text.isNotEmpty) {
-                        final notes = Notes(
-                          title: titleController.text,
-                          date: date.toString(),
-                          content: contentController.text,
-                        );
-                        context
-                            .read<NotesBloc>()
-                            .add(AddNotesEvent(notes: notes));
-                      }
-                    },
-                    icon: Icon(Icons.check_rounded)),
-              ],
             ),
             body: SingleChildScrollView(
               child: Column(

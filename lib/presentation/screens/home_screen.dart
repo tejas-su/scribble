@@ -65,7 +65,7 @@ class HomeScreen extends StatelessWidget {
                             },
                             icon: state.isGrid
                                 ? const Icon(Icons.grid_view_rounded)
-                                : const Icon(Icons.table_rows));
+                                : const Icon(Icons.table_rows_rounded));
                       },
                     ),
 
@@ -75,7 +75,7 @@ class HomeScreen extends StatelessWidget {
                             builder: (context) => const TodoScreen(),
                           ));
                         },
-                        icon: const Icon(Icons.task_alt_rounded))
+                        icon: const Icon(Icons.event_available))
                   ],
                 ),
               );

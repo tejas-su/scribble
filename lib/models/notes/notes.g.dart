@@ -17,6 +17,7 @@ class NotesAdapter extends TypeAdapter<Notes> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Notes(
+      isBookmarked: fields[3] as bool?,
       title: fields[0] as String,
       date: fields[1] as String,
       content: fields[2] as String,
@@ -26,13 +27,15 @@ class NotesAdapter extends TypeAdapter<Notes> {
   @override
   void write(BinaryWriter writer, Notes obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
       ..write(obj.date)
       ..writeByte(2)
-      ..write(obj.content);
+      ..write(obj.content)
+      ..writeByte(3)
+      ..write(obj.isBookmarked);
   }
 
   @override

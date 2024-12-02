@@ -15,6 +15,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     on<UpdateNotesEvent>(_onUpdateNotes);
     on<DeleteNotesEvent>(_onDelteNotes);
     on<UpdateBookMarkEvent>(_updateBookMark);
+    on<AddBookMarkEvent>(_addBookMark);
   }
   //load the notes
   void _onLoadNotes(LoadNotesEvent event, Emitter<NotesState> emit) {
@@ -33,7 +34,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
   void _onAddNotes(AddNotesEvent event, Emitter<NotesState> emit) async {
     emit(NotesLoadingState());
     try {
-      await hiveDatabase.addBookMark();
+      await hiveDatabase.addBookMark(false);
       await hiveDatabase.createNote(event.notes);
       List<Notes> notes = hiveDatabase.getNotes();
       List<Bookmarks> bookMarks = hiveDatabase.getBookMarks();
@@ -80,6 +81,19 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
       emit(NotesLoadedState(note: notes, bookMarks: bookMarks));
     } catch (e) {
       emit(NotesErrorState(errorMessage: e.toString()));
+    }
+  }
+
+  void _addBookMark(AddBookMarkEvent event, Emitter<NotesState> emit) {
+    emit(NotesLoadingState());
+    try {
+      hiveDatabase.addBookMark(event.value);
+      List<Notes> notes = hiveDatabase.getNotes();
+      List<Bookmarks> bookMarks = hiveDatabase.getBookMarks();
+      emit(NotesLoadedState(bookMarks: bookMarks, note: notes));
+    } catch (e) {
+      emit(NotesErrorState(
+          errorMessage: 'Something went wrong while saving your note'));
     }
   }
 }

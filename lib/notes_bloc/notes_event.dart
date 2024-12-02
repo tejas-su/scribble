@@ -45,3 +45,10 @@ class UpdateBookMarkEvent extends NotesEvent {
   @override
   List<Object> get props => [index];
 }
+
+class AddBookMarkEvent extends NotesEvent {
+  final bool value;
+  const AddBookMarkEvent({required this.value});
+  @override
+  List<Object> get props => [value];
+}

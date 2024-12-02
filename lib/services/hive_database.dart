@@ -43,8 +43,8 @@ class HiveDatabase {
 
   //while creating the note use addBookmark as initially
   //the user will note bookmark the note without the note even being created
-  Future<void> addBookMark() async {
-    await bookMarksBox.add(Bookmarks(isBookMarked: false));
+  Future<void> addBookMark(bool value) async {
+    await bookMarksBox.add(Bookmarks(isBookMarked: value));
   }
 
   Future<void> deleteBookMark(int index) async {

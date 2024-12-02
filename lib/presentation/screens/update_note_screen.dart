@@ -24,6 +24,9 @@ class UpdateNotesScreen extends StatelessWidget {
         TextEditingController(text: note.title);
     final TextEditingController contentController =
         TextEditingController(text: note.content);
+    //To listen to changes of bookmark state and build the ui as necessary
+    final notesLoadedState =
+        context.watch<NotesBloc>().state as NotesLoadedState;
     return BlocBuilder<NotesBloc, NotesState>(
       builder: (context, state) {
         return GestureDetector(
@@ -54,7 +57,14 @@ class UpdateNotesScreen extends StatelessWidget {
                 forceMaterialTransparency: true,
                 actions: [
                   IconButton(
-                      onPressed: () {}, icon: Icon(Icons.bookmark_rounded))
+                    onPressed: () {
+                      context.read<NotesBloc>().add(UpdateBookMarkEvent(
+                          index: index, isBookMarked: !isbookMarked));
+                    },
+                    icon: notesLoadedState.bookMarks[index].isBookMarked
+                        ? Icon(Icons.bookmark_rounded)
+                        : Icon(Icons.bookmark_outline_rounded),
+                  )
                 ],
               ),
               body: SingleChildScrollView(
