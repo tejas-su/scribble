@@ -36,3 +36,5 @@ class DeleteNotesEvent extends NotesEvent {
   @override
   List<Object> get props => [index];
 }
+
+class DeleteAllNotesevent extends NotesEvent {}

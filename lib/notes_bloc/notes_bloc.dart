@@ -12,13 +12,13 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     on<AddNotesEvent>(_onAddNotes);
     on<UpdateNotesEvent>(_onUpdateNotes);
     on<DeleteNotesEvent>(_onDelteNotes);
+    on<DeleteAllNotesevent>(_deleteAllNotes);
   }
   //load the notes
   void _onLoadNotes(LoadNotesEvent event, Emitter<NotesState> emit) {
     emit(NotesLoadingState());
     try {
       List<Notes> notes = hiveDatabase.getNotes();
-
       emit(NotesLoadedState(note: notes));
     } catch (e) {
       emit(NotesErrorState(errorMessage: e.toString()));
@@ -31,7 +31,6 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     try {
       await hiveDatabase.createNote(event.notes);
       List<Notes> notes = hiveDatabase.getNotes();
-
       emit(NotesLoadedState(note: notes));
     } catch (e) {
       emit(NotesErrorState(errorMessage: e.toString()));
@@ -43,9 +42,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     emit(NotesLoadingState());
     try {
       await hiveDatabase.deleteNote(event.index);
-      //   await hiveDatabase.deleteBookMark(event.index);
       List<Notes> notes = hiveDatabase.getNotes();
-
       emit(NotesLoadedState(note: notes));
     } catch (e) {
       emit(NotesErrorState(errorMessage: e.toString()));
@@ -57,10 +54,22 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     try {
       await hiveDatabase.updateNotes(event.index, event.notes);
       List<Notes> notes = hiveDatabase.getNotes();
-
       emit(NotesLoadedState(note: notes));
     } catch (e) {
       emit(NotesErrorState(errorMessage: e.toString()));
+    }
+  }
+
+  //Delete all notes from the database
+  void _deleteAllNotes(NotesEvent event, Emitter<NotesState> emit) {
+    emit(NotesLoadingState());
+    try {
+      hiveDatabase.deleteAllNotes();
+      List<Notes> notes = hiveDatabase.getNotes();
+      emit(NotesLoadedState(note: notes));
+    } catch (e) {
+      emit(NotesErrorState(
+          errorMessage: 'Something went wrong!\n ${e.toString()}'));
     }
   }
 }

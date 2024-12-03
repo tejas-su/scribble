@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'cubit/secrets_cubit.dart';
 import 'cubit/settings_cubit.dart';
 import 'models/notes/notes.dart';
 import 'models/settings/settings.dart';
@@ -44,6 +45,9 @@ void main() async {
             settingsBox: settingsBox,
             initialTheme: initialTheme),
       ),
+      BlocProvider(
+        create: (context) => SecretsCubit(),
+      )
     ],
     child: const MyApp(),
   ));

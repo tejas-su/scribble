@@ -1,5 +1,4 @@
 import 'package:hive_flutter/hive_flutter.dart';
-
 import 'package:scribble/models/notes/notes.dart';
 
 class HiveDatabase {
@@ -22,6 +21,14 @@ class HiveDatabase {
   Future<void> deleteNote(int index) async {
     try {
       await notesBox.deleteAt(index);
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  void deleteAllNotes() {
+    try {
+      notesBox.deleteAll(notesBox.keys);
     } catch (e) {
       throw Exception(e);
     }

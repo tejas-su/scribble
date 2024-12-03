@@ -43,6 +43,8 @@ class TodoScreen extends StatelessWidget {
             ),
           ),
           MessageField(
+              maxLines: 2,
+              minLines: 1,
               controller: controller,
               onSubmitted: null,
               prompt: 'Write your TODO')
