@@ -20,9 +20,8 @@ void main() async {
   //Custom object for hive
   Hive.registerAdapter(NotesAdapter());
   Hive.registerAdapter(SettingsAdapter());
-
   Box notesBox = await Hive.openBox<Notes>('notes');
-
+  Box secretNotes = await Hive.openBox<Notes>('secretnotes');
   Box settingsBox = await Hive.openBox<Settings>('settings');
 
   //For handling the initial error showing the the theme value is empty
@@ -38,6 +37,10 @@ void main() async {
       BlocProvider(
           create: (context) =>
               NotesBloc(hiveDatabase: HiveDatabase(notesBox: notesBox))
+                ..add(LoadNotesEvent())),
+      BlocProvider(
+          create: (context) =>
+              SecretNotesBloc(hiveDatabase: HiveDatabase(notesBox: secretNotes))
                 ..add(LoadNotesEvent())),
       BlocProvider(
         create: (context) => SettingsCubit(

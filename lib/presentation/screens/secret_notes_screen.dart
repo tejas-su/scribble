@@ -2,60 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lottie/lottie.dart';
-import 'package:scribble/presentation/screens/settings_screen.dart';
 import '../../cubit/settings_cubit.dart';
 import '../../models/notes/notes.dart';
 import '../../models/settings/settings.dart';
 import '../../notes_bloc/notes_bloc.dart';
 import '../widgets/notes_card.dart';
 import 'new_notes_screen.dart';
-import 'secret_login_screen.dart';
 import 'update_note_screen.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class SecretNotesScreen extends StatelessWidget {
+  const SecretNotesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        forceMaterialTransparency: true,
-        surfaceTintColor: Theme.of(context).appBarTheme.surfaceTintColor,
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        titleSpacing: 20,
-        title: GestureDetector(
-          onLongPress: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => SecretLoginScreen(),
-          )),
-          child: Text(
-            'scribble',
-            style: GoogleFonts.inter(
-              color: Theme.of(context).textTheme.titleLarge?.color,
-              fontWeight: FontWeight.bold,
-              fontSize: 32,
-            ),
-          ),
+          title: Text(
+        'secrets',
+        style: GoogleFonts.inter(
+          color: Theme.of(context).textTheme.titleLarge?.color,
+          fontWeight: FontWeight.bold,
+          fontSize: 32,
         ),
-        actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const SettingsScreen(),
-                ));
-              },
-              icon: const Icon(Icons.settings_rounded)),
-        ],
-      ),
+      )),
       floatingActionButton: FloatingActionButton(
         elevation: 0,
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => const NewNotesScreen(
-                isHomeScreen: true,
+                isHomeScreen: false,
               ),
             ),
           );
@@ -67,7 +43,7 @@ class HomeScreen extends StatelessWidget {
           color: Theme.of(context).iconTheme.color,
         ),
       ),
-      body: BlocBuilder<NotesBloc, NotesState>(
+      body: BlocBuilder<SecretNotesBloc, NotesState>(
         builder: (context, state) {
           return switch (state) {
             //Loading state
@@ -92,18 +68,18 @@ class HomeScreen extends StatelessWidget {
                         return NotesCard(
                           onPressedSlidable: (context) {
                             context
-                                .read<NotesBloc>()
+                                .read<SecretNotesBloc>()
                                 .add(DeleteNotesEvent(index: index));
                           },
                           onDismissed: () {
                             context
-                                .read<NotesBloc>()
+                                .read<SecretNotesBloc>()
                                 .add(DeleteNotesEvent(index: index));
                           },
                           onTap: () {
                             Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => UpdateNotesScreen(
-                                isHomeScreen: true,
+                                isHomeScreen: false,
                                 note: state.note[index],
                                 index: index,
                               ),
@@ -124,10 +100,11 @@ class HomeScreen extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Lottie.asset('assets/lottie/empty_list.json'),
-                          Text(
-                            'Everything looks empty here !',
-                            style: TextStyle(fontSize: 20),
+                          Center(
+                            child: Text(
+                              'Everything looks empty here !',
+                              style: TextStyle(fontSize: 20),
+                            ),
                           ),
                         ],
                       ),
@@ -144,7 +121,7 @@ class HomeScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 24),
                 )),
-              )
+              ),
           };
         },
       ),

@@ -5,9 +5,8 @@ import '../../notes_bloc/notes_bloc.dart';
 import '../../models/notes/notes.dart';
 
 class NewNotesScreen extends StatelessWidget {
-  const NewNotesScreen({
-    super.key,
-  });
+  final bool isHomeScreen;
+  const NewNotesScreen({super.key, required this.isHomeScreen});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +26,11 @@ class NewNotesScreen extends StatelessWidget {
                 date: date.toString(),
                 content: contentController.text,
               );
-              context.read<NotesBloc>().add(AddNotesEvent(notes: notes));
+              isHomeScreen
+                  ? context.read<NotesBloc>().add(AddNotesEvent(notes: notes))
+                  : context
+                      .read<SecretNotesBloc>()
+                      .add(AddNotesEvent(notes: notes));
             }
           },
           child: Scaffold(

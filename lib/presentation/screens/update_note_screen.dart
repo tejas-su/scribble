@@ -7,9 +7,11 @@ import '../../models/notes/notes.dart';
 class UpdateNotesScreen extends StatelessWidget {
   final Notes note;
   final int index;
+  final bool isHomeScreen;
 
   const UpdateNotesScreen({
     super.key,
+    required this.isHomeScreen,
     required this.note,
     required this.index,
   });
@@ -37,9 +39,13 @@ class UpdateNotesScreen extends StatelessWidget {
                   date: date.toString(),
                   content: contentController.text,
                   isBookmarked: notesLoadedState.note[index].isBookmarked);
-              context
-                  .read<NotesBloc>()
-                  .add(UpdateNotesEvent(notes: notes, index: index));
+              isHomeScreen
+                  ? context
+                      .read<NotesBloc>()
+                      .add(UpdateNotesEvent(notes: notes, index: index))
+                  : context
+                      .read<SecretNotesBloc>()
+                      .add(UpdateNotesEvent(notes: notes, index: index));
             },
             child: Scaffold(
               appBar: AppBar(
