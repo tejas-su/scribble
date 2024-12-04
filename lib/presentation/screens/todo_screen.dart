@@ -1,53 +1,104 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:scribble/presentation/widgets/message_field.dart';
-import 'package:scribble/presentation/widgets/todo_card.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
+import '../../models/todos/todos.dart';
+import '/bloc/todos_bloc/todos_bloc.dart';
+import '/presentation/widgets/message_field.dart';
+import '/presentation/widgets/todo_card.dart';
 
 class TodoScreen extends StatelessWidget {
   const TodoScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController controller = TextEditingController();
+    TextEditingController todoController = TextEditingController();
+    String date = DateFormat.yMMMEd().format(DateTime.now()).toString();
     return Scaffold(
-      appBar: AppBar(
-        forceMaterialTransparency: true,
-        titleSpacing: 20,
-        foregroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        surfaceTintColor: null,
-        title: Text(
-          'scribble',
-          style: GoogleFonts.inter(
-            color: Theme.of(context).textTheme.titleLarge?.color,
-            fontWeight: FontWeight.bold,
-            fontSize: 32,
-          ),
-        ),
-      ),
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              itemCount: 10,
-              padding: const EdgeInsets.all(15),
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                return Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: TodoCard(
-                      date: 'Nov,$index, Sunday',
-                      todo: 'Test Todo UI',
-                    ));
+            child: BlocBuilder<TodosBloc, TodosState>(
+              builder: (context, state) {
+                return switch (state) {
+                  TodosLoadingState() => Center(
+                      child: SizedBox(child: CircularProgressIndicator()),
+                    ),
+                  TodosLoadedState() => Builder(builder: (context) {
+                      if (state.todo.isNotEmpty) {
+                        return ListView.builder(
+                          itemCount: state.todo.length,
+                          padding: const EdgeInsets.all(15),
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            Todos todo = state.todo[index];
+                            return Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: TodoCard(
+                                  onChanged: (p0) {
+                                    context.read<TodosBloc>().add(
+                                        UpdateTodoEvent(
+                                            todo: todo.copyWith(
+                                                isCompleted: !todo.isCompleted),
+                                            index: index));
+                                  },
+                                  onPressedSlidable: (p0) {
+                                    context
+                                        .read<TodosBloc>()
+                                        .add(DeleteTodoEvent(index: index));
+                                  },
+                                  onDismissed: () {
+                                    context
+                                        .read<TodosBloc>()
+                                        .add(DeleteTodoEvent(index: index));
+                                  },
+                                  value: todo.isCompleted,
+                                  date: todo.date,
+                                  todo: todo.todo,
+                                ));
+                          },
+                        );
+                      } else {
+                        return Center(
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(left: 20.0, right: 20),
+                            child: SingleChildScrollView(
+                              physics: NeverScrollableScrollPhysics(),
+                              child: Column(
+                                children: [
+                                  Lottie.asset('assets/lottie/empty_list.json'),
+                                  Text(
+                                    'Everything looks empty here !',
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    }),
+                  TodoErrorState() => Center(
+                      child: SizedBox(child: Text(state.errorMessage)),
+                    ),
+                };
               },
             ),
           ),
           MessageField(
-              maxLines: 2,
-              minLines: 1,
-              controller: controller,
-              onSubmitted: null,
-              prompt: 'Write your TODO')
+            maxLines: 2,
+            minLines: 1,
+            controller: todoController,
+            onSubmitted: () {
+              if (todoController.text.isNotEmpty) {
+                Todos todo = Todos(
+                    isCompleted: false, date: date, todo: todoController.text);
+                context.read<TodosBloc>().add(AddtodoEvent(todo: todo));
+              }
+            },
+            prompt: 'Write your TODO',
+          )
         ],
       ),
     );

@@ -43,11 +43,10 @@ class SecretLoginScreen extends StatelessWidget {
               BlocBuilder<SecretsCubit, SecretsCubitState>(
                 builder: (context, state) {
                   return MessageField(
-                    onComplete: (password) async {
+                    onComplete: (password) {
                       context
                           .read<SecretsCubit>()
-                          .onValidate(password, context, SecretNotesScreen());
-                      passwordController.clear();
+                          .onValidate(password, context);
                     },
                     padding: 8,
                     maxLines: 1,

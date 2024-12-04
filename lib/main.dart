@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'bloc/todos_bloc/todos_bloc.dart';
 import 'cubit/secrets_cubit.dart';
 import 'cubit/settings_cubit.dart';
 import 'models/notes/notes.dart';
 import 'models/settings/settings.dart';
-import 'notes_bloc/notes_bloc.dart';
+import 'bloc/notes_bloc/notes_bloc.dart';
+import 'models/todos/todos.dart';
 import 'presentation/themes/themes.dart';
 import 'presentation/screens/home_screen.dart';
 import 'package:path_provider/path_provider.dart';
@@ -20,7 +22,9 @@ void main() async {
   //Custom object for hive
   Hive.registerAdapter(NotesAdapter());
   Hive.registerAdapter(SettingsAdapter());
+  Hive.registerAdapter(TodosAdapter());
   Box notesBox = await Hive.openBox<Notes>('notes');
+  Box todosBox = await Hive.openBox<Todos>('todos');
   Box secretNotes = await Hive.openBox<Notes>('secretnotes');
   Box settingsBox = await Hive.openBox<Settings>('settings');
 
@@ -36,18 +40,22 @@ void main() async {
     providers: [
       BlocProvider(
           create: (context) =>
-              NotesBloc(hiveDatabase: HiveDatabase(notesBox: notesBox))
+              NotesBloc(hiveDatabase: HiveNotesDatabase(notesBox: notesBox))
                 ..add(LoadNotesEvent())),
       BlocProvider(
-          create: (context) =>
-              SecretNotesBloc(hiveDatabase: HiveDatabase(notesBox: secretNotes))
-                ..add(LoadNotesEvent())),
+          create: (context) => SecretNotesBloc(
+              hiveDatabase: HiveNotesDatabase(notesBox: secretNotes))
+            ..add(LoadNotesEvent())),
       BlocProvider(
         create: (context) => SettingsCubit(
             initialLayout: initialLayout,
             settingsBox: settingsBox,
             initialTheme: initialTheme),
       ),
+      BlocProvider(
+          create: (context) =>
+              TodosBloc(hiveDatabase: HiveTodosDatabase(todosBox: todosBox))
+                ..add(LoadTodoEvent())),
       BlocProvider(
         create: (context) => SecretsCubit(),
       )

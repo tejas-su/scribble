@@ -1,60 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import '../../cubit/settings_cubit.dart';
 import '../../models/notes/notes.dart';
 import '../../models/settings/settings.dart';
 import '../../bloc/notes_bloc/notes_bloc.dart';
-import '../utils/helper_functions.dart';
 import '../widgets/notes_card.dart';
 import 'new_notes_screen.dart';
 import 'update_note_screen.dart';
 
-class SecretNotesScreen extends StatelessWidget {
-  const SecretNotesScreen({super.key});
+class NotesScreen extends StatelessWidget {
+  const NotesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'secrets',
-          style: GoogleFonts.inter(
-            color: Theme.of(context).textTheme.titleLarge?.color,
-            fontWeight: FontWeight.bold,
-            fontSize: 32,
-          ),
-        ),
-        actions: [
-          IconButton(
-              onPressed: () {
-                showAlertDialog(
-                  context: context,
-                  content: Text(
-                    'Are you sure you want to delete all the notes, this action cannot be undone',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  title: 'Delete all notes!',
-                  onPressed: () {
-                    context.read<SecretNotesBloc>().add(DeleteAllNotesevent());
-                    Navigator.of(context).pop();
-                  },
-                );
-              },
-              icon: Icon(
-                Icons.delete_rounded,
-                color: Colors.redAccent,
-              ))
-        ],
-      ),
       floatingActionButton: FloatingActionButton(
         elevation: 0,
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => const NewNotesScreen(
-                isHomeScreen: false,
+                isHomeScreen: true,
               ),
             ),
           );
@@ -66,7 +34,7 @@ class SecretNotesScreen extends StatelessWidget {
           color: Theme.of(context).iconTheme.color,
         ),
       ),
-      body: BlocBuilder<SecretNotesBloc, NotesState>(
+      body: BlocBuilder<NotesBloc, NotesState>(
         builder: (context, state) {
           return switch (state) {
             //Loading state
@@ -91,18 +59,18 @@ class SecretNotesScreen extends StatelessWidget {
                         return NotesCard(
                           onPressedSlidable: (context) {
                             context
-                                .read<SecretNotesBloc>()
+                                .read<NotesBloc>()
                                 .add(DeleteNotesEvent(index: index));
                           },
                           onDismissed: () {
                             context
-                                .read<SecretNotesBloc>()
+                                .read<NotesBloc>()
                                 .add(DeleteNotesEvent(index: index));
                           },
                           onTap: () {
                             Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => UpdateNotesScreen(
-                                isHomeScreen: false,
+                                isHomeScreen: true,
                                 note: state.note[index],
                                 index: index,
                               ),
@@ -123,11 +91,10 @@ class SecretNotesScreen extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Center(
-                            child: Text(
-                              'Everything looks empty here !',
-                              style: TextStyle(fontSize: 20),
-                            ),
+                          Lottie.asset('assets/lottie/empty_list.json'),
+                          Text(
+                            'Everything looks empty here !',
+                            style: TextStyle(fontSize: 20),
                           ),
                         ],
                       ),
@@ -144,7 +111,7 @@ class SecretNotesScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 24),
                 )),
-              ),
+              )
           };
         },
       ),

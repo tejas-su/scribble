@@ -1,17 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lottie/lottie.dart';
 import 'package:scribble/presentation/screens/settings_screen.dart';
-import '../../cubit/settings_cubit.dart';
-import '../../models/notes/notes.dart';
-import '../../models/settings/settings.dart';
-import '../../notes_bloc/notes_bloc.dart';
-import '../widgets/notes_card.dart';
-import 'new_notes_screen.dart';
+import 'notes_screen.dart';
 import 'secret_login_screen.dart';
-import 'update_note_screen.dart';
+import 'todo_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -19,135 +11,38 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        forceMaterialTransparency: true,
-        surfaceTintColor: Theme.of(context).appBarTheme.surfaceTintColor,
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        titleSpacing: 20,
-        title: GestureDetector(
-          onLongPress: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => SecretLoginScreen(),
-          )),
-          child: Text(
-            'scribble',
-            style: GoogleFonts.inter(
-              color: Theme.of(context).textTheme.titleLarge?.color,
-              fontWeight: FontWeight.bold,
-              fontSize: 32,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          forceMaterialTransparency: true,
+          surfaceTintColor: Theme.of(context).appBarTheme.surfaceTintColor,
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+          titleSpacing: 20,
+          title: GestureDetector(
+            onLongPress: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => SecretLoginScreen(),
+            )),
+            child: Text(
+              'scribble',
+              style: GoogleFonts.inter(
+                color: Theme.of(context).textTheme.titleLarge?.color,
+                fontWeight: FontWeight.bold,
+                fontSize: 32,
+              ),
             ),
           ),
-        ),
-        actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const SettingsScreen(),
-                ));
-              },
-              icon: const Icon(Icons.settings_rounded)),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        elevation: 0,
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const NewNotesScreen(
-                isHomeScreen: true,
-              ),
-            ),
-          );
-        },
-        backgroundColor:
-            Theme.of(context).floatingActionButtonTheme.backgroundColor,
-        child: Icon(
-          Icons.edit_rounded,
-          color: Theme.of(context).iconTheme.color,
-        ),
-      ),
-      body: BlocBuilder<NotesBloc, NotesState>(
-        builder: (context, state) {
-          return switch (state) {
-            //Loading state
-            NotesLoadingState() => Center(
-                  child: CircularProgressIndicator(
-                color: Theme.of(context).textTheme.titleLarge?.color,
-              )),
-            //Loaded state
-            NotesLoadedState() => BlocBuilder<SettingsCubit, Settings>(
-                builder: (context, layout) {
-                  if (state.note.isNotEmpty) {
-                    return MasonryGridView.builder(
-                      gridDelegate:
-                          SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: layout.isGrid ? 2 : 1),
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      padding: const EdgeInsets.all(18),
-                      itemCount: state.note.length,
-                      itemBuilder: (context, index) {
-                        Notes notes = state.note[index]; //index position
-                        return NotesCard(
-                          onPressedSlidable: (context) {
-                            context
-                                .read<NotesBloc>()
-                                .add(DeleteNotesEvent(index: index));
-                          },
-                          onDismissed: () {
-                            context
-                                .read<NotesBloc>()
-                                .add(DeleteNotesEvent(index: index));
-                          },
-                          onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => UpdateNotesScreen(
-                                isHomeScreen: true,
-                                note: state.note[index],
-                                index: index,
-                              ),
-                            ));
-                          },
-                          icon: state.note[index].isBookmarked
-                              ? Icons.bookmark_rounded
-                              : null,
-                          date: notes.date,
-                          title: notes.title,
-                          content: notes.content,
-                        );
-                      },
-                    );
-                  } else {
-                    return Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Lottie.asset('assets/lottie/empty_list.json'),
-                          Text(
-                            'Everything looks empty here !',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
+                  ));
                 },
-              ),
-            //Error state
-            NotesErrorState() => Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Center(
-                    child: Text(
-                  state.errorMessage,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 24),
-                )),
-              )
-          };
-        },
-      ),
-    );
+                icon: const Icon(Icons.settings_rounded)),
+          ],
+        ),
+        body: PageView(
+          children: [NotesScreen(), TodoScreen()],
+        ));
   }
 }

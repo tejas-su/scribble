@@ -1,12 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import '../models/notes/notes.dart';
-import '../services/hive_database.dart';
+import '../../models/notes/notes.dart';
+import '../../services/hive_database.dart';
 part 'notes_event.dart';
 part 'notes_state.dart';
 
 class NotesBloc extends Bloc<NotesEvent, NotesState> {
-  final HiveDatabase hiveDatabase;
+  final HiveNotesDatabase hiveDatabase;
   NotesBloc({required this.hiveDatabase}) : super(NotesLoadingState()) {
     on<LoadNotesEvent>(_onLoadNotes);
     on<AddNotesEvent>(_onAddNotes);

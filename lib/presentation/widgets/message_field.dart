@@ -50,7 +50,7 @@ class MessageField extends StatelessWidget {
     this.icon = Icons.add_rounded,
     this.obscureText = false,
     required this.controller,
-    required this.onSubmitted,
+    this.onSubmitted,
     required this.prompt,
   });
 

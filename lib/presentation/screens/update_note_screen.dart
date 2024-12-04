@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../notes_bloc/notes_bloc.dart';
+import '../../bloc/notes_bloc/notes_bloc.dart';
 import '../../models/notes/notes.dart';
 
 class UpdateNotesScreen extends StatelessWidget {

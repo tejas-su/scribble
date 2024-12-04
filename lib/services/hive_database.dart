@@ -1,10 +1,12 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:scribble/models/notes/notes.dart';
 
-class HiveDatabase {
+import '../models/todos/todos.dart';
+
+class HiveNotesDatabase {
   final Box notesBox;
 
-  const HiveDatabase({required this.notesBox});
+  const HiveNotesDatabase({required this.notesBox});
   //Notes box functions
   List<Notes> getNotes() {
     return notesBox.values.toList().cast<Notes>();
@@ -29,6 +31,39 @@ class HiveDatabase {
   void deleteAllNotes() {
     try {
       notesBox.deleteAll(notesBox.keys);
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+}
+
+class HiveTodosDatabase {
+  final Box todosBox;
+  HiveTodosDatabase({required this.todosBox});
+
+  List<Todos> getTodos() {
+    return todosBox.values.toList().cast<Todos>();
+  }
+
+  Future<void> createTodo(Todos todos) async {
+    await todosBox.add(todos);
+  }
+
+  Future<void> updateTodo(int index, Todos todo) async {
+    await todosBox.putAt(index, todo);
+  }
+
+  Future<void> deleteTodo(int index) async {
+    try {
+      await todosBox.deleteAt(index);
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  void deleteAllTodos() {
+    try {
+      todosBox.deleteAll(todosBox.keys);
     } catch (e) {
       throw Exception(e);
     }
