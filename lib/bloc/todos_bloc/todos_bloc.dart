@@ -13,6 +13,7 @@ class TodosBloc extends Bloc<TodosEvent, TodosState> {
     on<UpdateTodoEvent>(_onUpdateTodo);
     on<DeleteTodoEvent>(_onDelteTodo);
     on<DeleteAllTodoEvent>(_deleteAllTodos);
+    on<EditTodoEvent>(_editTodo);
   }
   //load the todos
   void _onLoadTodos(LoadTodoEvent event, Emitter<TodosState> emit) {
@@ -71,5 +72,9 @@ class TodosBloc extends Bloc<TodosEvent, TodosState> {
       emit(TodoErrorState(
           errorMessage: 'Something went wrong!\n ${e.toString()}'));
     }
+  }
+
+  void _editTodo(EditTodoEvent event, Emitter<TodosState> emit) {
+    emit(TodosEditingstate(todo: event.todo, index: event.index));
   }
 }

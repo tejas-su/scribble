@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:scribble/presentation/screens/settings_screen.dart';
+import '../../cubit/page_view_cubit.dart';
 import 'notes_screen.dart';
 import 'secret_login_screen.dart';
 import 'todo_screen.dart';
@@ -32,6 +34,23 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           actions: [
+            BlocBuilder<PageViewCubit, int>(
+              builder: (context, page) {
+                if (page == 0) {
+                  return IconButton(
+                      onPressed: () {
+                        context.read<PageViewCubit>().togglePage(1);
+                      },
+                      icon: const Icon(Icons.today_rounded));
+                } else {
+                  return IconButton(
+                      onPressed: () {
+                        context.read<PageViewCubit>().togglePage(0);
+                      },
+                      icon: const Icon(Icons.edit_rounded));
+                }
+              },
+            ),
             IconButton(
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(
@@ -41,8 +60,11 @@ class HomeScreen extends StatelessWidget {
                 icon: const Icon(Icons.settings_rounded)),
           ],
         ),
-        body: PageView(
-          children: [NotesScreen(), TodoScreen()],
+        body: BlocBuilder<PageViewCubit, int>(
+          builder: (context, page) {
+            List<Widget> pages = [NotesScreen(), TodoScreen()];
+            return pages[page];
+          },
         ));
   }
 }

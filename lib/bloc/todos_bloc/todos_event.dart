@@ -38,3 +38,20 @@ final class DeleteTodoEvent extends TodosEvent {
 }
 
 final class DeleteAllTodoEvent extends TodosEvent {}
+
+final class EditTodoEvent extends TodosEvent {
+  final Todos todo;
+
+  final int index;
+
+  const EditTodoEvent({required this.todo, required this.index});
+}
+
+final class CancelUpdateTodoEvent extends TodosEvent {
+  final Todos todo;
+  final bool cancel;
+  final int index;
+
+  const CancelUpdateTodoEvent(
+      {required this.todo, required this.index, required this.cancel});
+}

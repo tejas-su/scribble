@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class MessageField extends StatelessWidget {
   ///Hint text to be sghown in the input field
-  final String prompt;
+  final String? prompt;
 
   ///The text editing controller to handle the input text
   final TextEditingController? controller;
@@ -38,8 +38,17 @@ class MessageField extends StatelessWidget {
 
   ///Text to be shown when there is an error
   final String? errorText;
+
+  /// To open the keyboard automatically whenever the textfield is called or appears
+  final bool autofocus;
+
+  /// Label text
+  final String? labelText;
+
   const MessageField({
     this.errorText,
+    this.labelText,
+    this.autofocus = false,
     this.onComplete,
     this.keyboardType,
     super.key,
@@ -51,7 +60,7 @@ class MessageField extends StatelessWidget {
     this.obscureText = false,
     required this.controller,
     this.onSubmitted,
-    required this.prompt,
+    this.prompt,
   });
 
   @override
@@ -59,6 +68,7 @@ class MessageField extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.all(padding),
       child: TextField(
+        autofocus: autofocus,
         keyboardType: keyboardType,
         obscureText: obscureText,
         onTapOutside: (event) => FocusScope.of(context).unfocus(),
@@ -71,6 +81,8 @@ class MessageField extends StatelessWidget {
         onSubmitted: onComplete,
         style: const TextStyle(fontSize: 18),
         decoration: InputDecoration(
+            labelStyle: TextStyle(fontSize: 20),
+            labelText: labelText,
             contentPadding: const EdgeInsets.all(20),
             filled: true,
             fillColor: Theme.of(context).cardColor,

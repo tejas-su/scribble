@@ -9,6 +9,18 @@ sealed class TodosState extends Equatable {
 
 final class TodosLoadingState extends TodosState {}
 
+final class TodosEditingstate extends TodosState {
+  final int index;
+  final Todos todo;
+
+  const TodosEditingstate({
+    required this.todo,
+    required this.index,
+  });
+  @override
+  List<Object> get props => [index, todo];
+}
+
 final class TodosLoadedState extends TodosState {
   final List<Todos> todo;
 

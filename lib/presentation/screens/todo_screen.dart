@@ -35,6 +35,10 @@ class TodoScreen extends StatelessWidget {
                             return Padding(
                                 padding: const EdgeInsets.only(bottom: 10),
                                 child: TodoCard(
+                                  onLongPress: () {
+                                    context.read<TodosBloc>().add(EditTodoEvent(
+                                        todo: todo, index: index));
+                                  },
                                   onChanged: (p0) {
                                     context.read<TodosBloc>().add(
                                         UpdateTodoEvent(
@@ -82,22 +86,72 @@ class TodoScreen extends StatelessWidget {
                   TodoErrorState() => Center(
                       child: SizedBox(child: Text(state.errorMessage)),
                     ),
+                  TodosEditingstate() => Builder(
+                      builder: (context) {
+                        TextEditingController editingController =
+                            TextEditingController(text: state.todo.todo);
+                        return Center(
+                          child: MessageField(
+                            maxLines: 1,
+                            minLines: 1,
+                            onComplete: (p0) {
+                              context.read<TodosBloc>().add(UpdateTodoEvent(
+                                  todo: state.todo
+                                      .copyWith(todo: editingController.text),
+                                  index: state.index));
+                            },
+                            autofocus: true,
+                            onSubmitted: () => context.read<TodosBloc>().add(
+                                UpdateTodoEvent(
+                                    todo: state.todo
+                                        .copyWith(todo: editingController.text),
+                                    index: state.index)),
+                            controller: editingController,
+                            labelText: 'Edit your TODO',
+                            icon: Icons.done_rounded,
+                          ),
+                        );
+                      },
+                    )
                 };
               },
             ),
           ),
-          MessageField(
-            maxLines: 2,
-            minLines: 1,
-            controller: todoController,
-            onSubmitted: () {
-              if (todoController.text.isNotEmpty) {
-                Todos todo = Todos(
-                    isCompleted: false, date: date, todo: todoController.text);
-                context.read<TodosBloc>().add(AddtodoEvent(todo: todo));
+          BlocBuilder<TodosBloc, TodosState>(
+            builder: (context, state) {
+              if (state is TodosEditingstate) {
+                return SizedBox();
+              } else {
+                return MessageField(
+                  maxLines: 1,
+                  minLines: 1,
+                  onComplete: (p0) {
+                    if (todoController.text.isNotEmpty) {
+                      Todos todo = Todos(
+                          isCompleted: false,
+                          date: date,
+                          todo: todoController.text);
+                      context.read<TodosBloc>().add(AddtodoEvent(todo: todo));
+                      todoController.clear();
+                      FocusScope.of(context).unfocus();
+                    }
+                  },
+                  controller: todoController,
+                  onSubmitted: () {
+                    if (todoController.text.isNotEmpty) {
+                      Todos todo = Todos(
+                          isCompleted: false,
+                          date: date,
+                          todo: todoController.text);
+                      context.read<TodosBloc>().add(AddtodoEvent(todo: todo));
+                      todoController.clear();
+                      FocusScope.of(context).unfocus();
+                    }
+                  },
+                  prompt: 'Write your TODO',
+                );
               }
             },
-            prompt: 'Write your TODO',
           )
         ],
       ),

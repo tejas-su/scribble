@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'bloc/todos_bloc/todos_bloc.dart';
+import 'cubit/page_view_cubit.dart';
 import 'cubit/secrets_cubit.dart';
 import 'cubit/settings_cubit.dart';
 import 'models/notes/notes.dart';
@@ -58,7 +59,8 @@ void main() async {
                 ..add(LoadTodoEvent())),
       BlocProvider(
         create: (context) => SecretsCubit(),
-      )
+      ),
+      BlocProvider(create: (context) => PageViewCubit()),
     ],
     child: const MyApp(),
   ));
