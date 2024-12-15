@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:scribble/presentation/widgets/message_field.dart';
 import '../../cubit/secrets_cubit.dart';
-import 'secret_notes_screen.dart';
 
 class SecretLoginScreen extends StatelessWidget {
   const SecretLoginScreen({super.key});
@@ -44,6 +43,7 @@ class SecretLoginScreen extends StatelessWidget {
                 builder: (context, state) {
                   return MessageField(
                     onComplete: (password) {
+                      //TODO: Handle password submission and validation
                       context
                           .read<SecretsCubit>()
                           .onValidate(password, context);

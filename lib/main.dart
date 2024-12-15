@@ -24,9 +24,9 @@ void main() async {
   Hive.registerAdapter(NotesAdapter());
   Hive.registerAdapter(SettingsAdapter());
   Hive.registerAdapter(TodosAdapter());
-  Box notesBox = await Hive.openBox<Notes>('notes');
-  Box todosBox = await Hive.openBox<Todos>('todos');
-  Box secretNotes = await Hive.openBox<Notes>('secretnotes');
+  HiveNotesDatabase(boxName: 'notes');
+  HiveTodosDatabase(boxName: 'todos');
+
   Box settingsBox = await Hive.openBox<Settings>('settings');
 
   //For handling the initial error showing the the theme value is empty
@@ -41,11 +41,11 @@ void main() async {
     providers: [
       BlocProvider(
           create: (context) =>
-              NotesBloc(hiveDatabase: HiveNotesDatabase(notesBox: notesBox))
+              NotesBloc(hiveDatabase: HiveNotesDatabase(boxName: 'notes'))
                 ..add(LoadNotesEvent())),
       BlocProvider(
           create: (context) => SecretNotesBloc(
-              hiveDatabase: HiveNotesDatabase(notesBox: secretNotes))
+              hiveDatabase: HiveNotesDatabase(boxName: 'secretnotes'))
             ..add(LoadNotesEvent())),
       BlocProvider(
         create: (context) => SettingsCubit(
@@ -55,7 +55,7 @@ void main() async {
       ),
       BlocProvider(
           create: (context) =>
-              TodosBloc(hiveDatabase: HiveTodosDatabase(todosBox: todosBox))
+              TodosBloc(hiveDatabase: HiveTodosDatabase(boxName: 'todos'))
                 ..add(LoadTodoEvent())),
       BlocProvider(
         create: (context) => SecretsCubit(),

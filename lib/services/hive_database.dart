@@ -1,28 +1,34 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:scribble/models/notes/notes.dart';
-
 import '../models/todos/todos.dart';
 
 class HiveNotesDatabase {
-  final Box notesBox;
+  late Box _notesBox;
+  final String boxName;
+  HiveNotesDatabase({required this.boxName}) {
+    _opennotesBox();
+  }
 
-  const HiveNotesDatabase({required this.notesBox});
+  Future<void> _opennotesBox() async {
+    _notesBox = await Hive.openBox(boxName);
+  }
+
   //Notes box functions
   List<Notes> getNotes() {
-    return notesBox.values.toList().cast<Notes>();
+    return _notesBox.values.toList().cast<Notes>();
   }
 
   Future<void> createNote(Notes notes) async {
-    await notesBox.add(notes);
+    await _notesBox.add(notes);
   }
 
   Future<void> updateNotes(int index, Notes notes) async {
-    await notesBox.putAt(index, notes);
+    await _notesBox.putAt(index, notes);
   }
 
   Future<void> deleteNote(int index) async {
     try {
-      await notesBox.deleteAt(index);
+      await _notesBox.deleteAt(index);
     } catch (e) {
       throw Exception(e);
     }
@@ -30,7 +36,7 @@ class HiveNotesDatabase {
 
   void deleteAllNotes() {
     try {
-      notesBox.deleteAll(notesBox.keys);
+      _notesBox.deleteAll(_notesBox.keys);
     } catch (e) {
       throw Exception(e);
     }
@@ -38,24 +44,31 @@ class HiveNotesDatabase {
 }
 
 class HiveTodosDatabase {
-  final Box todosBox;
-  HiveTodosDatabase({required this.todosBox});
+  final String boxName;
+  late Box _todosBox;
+  HiveTodosDatabase({required this.boxName}) {
+    _openBox();
+  }
+
+  Future<void> _openBox() async {
+    _todosBox = await Hive.openBox(boxName);
+  }
 
   List<Todos> getTodos() {
-    return todosBox.values.toList().cast<Todos>();
+    return _todosBox.values.toList().cast<Todos>();
   }
 
   Future<void> createTodo(Todos todos) async {
-    await todosBox.add(todos);
+    await _todosBox.add(todos);
   }
 
   Future<void> updateTodo(int index, Todos todo) async {
-    await todosBox.putAt(index, todo);
+    await _todosBox.putAt(index, todo);
   }
 
   Future<void> deleteTodo(int index) async {
     try {
-      await todosBox.deleteAt(index);
+      await _todosBox.deleteAt(index);
     } catch (e) {
       throw Exception(e);
     }
@@ -63,7 +76,7 @@ class HiveTodosDatabase {
 
   void deleteAllTodos() {
     try {
-      todosBox.deleteAll(todosBox.keys);
+      _todosBox.deleteAll(_todosBox.keys);
     } catch (e) {
       throw Exception(e);
     }
