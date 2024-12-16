@@ -4,14 +4,14 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 class TodoCard extends StatelessWidget {
   final String todo;
   final String date;
-  final Function()? onLongPress;
+  final Function()? onTap;
   final Function() onDismissed;
   final Function(BuildContext)? onPressedSlidable;
   final Function(bool?)? onChanged;
   final bool value;
   const TodoCard({
     super.key,
-    this.onLongPress,
+    this.onTap,
     this.onPressedSlidable,
     this.onChanged,
     required this.onDismissed,
@@ -40,23 +40,23 @@ class TodoCard extends StatelessWidget {
               icon: Icons.delete_rounded,
             ),
           ]),
-      child: GestureDetector(
-        onLongPress: onLongPress,
-        child: Container(
-          height: 90,
-          decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              borderRadius: const BorderRadius.all(Radius.circular(15))),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
+      child: Container(
+        height: 90,
+        decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: const BorderRadius.all(Radius.circular(15))),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: onTap,
+                    child: Text(
                       todo,
                       maxLines: 1,
                       style: TextStyle(
@@ -67,22 +67,22 @@ class TodoCard extends StatelessWidget {
                               : Theme.of(context).textTheme.titleLarge?.color,
                           fontSize: 18),
                     ),
-                    Text(
-                      date,
-                      style: TextStyle(
-                          color: value
-                              ? Colors.grey
-                              : Theme.of(context).textTheme.titleLarge?.color,
-                          fontSize: 14),
-                    ),
-                  ],
-                ),
-                Checkbox(
-                  value: value,
-                  onChanged: onChanged,
-                )
-              ],
-            ),
+                  ),
+                  Text(
+                    date,
+                    style: TextStyle(
+                        color: value
+                            ? Colors.grey
+                            : Theme.of(context).textTheme.titleLarge?.color,
+                        fontSize: 14),
+                  ),
+                ],
+              ),
+              Checkbox(
+                value: value,
+                onChanged: onChanged,
+              )
+            ],
           ),
         ),
       ),

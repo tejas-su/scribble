@@ -125,6 +125,19 @@ class SettingsScreen extends StatelessWidget {
                       trailing: Icon(Icons.delete_rounded),
                       tileColor: Theme.of(context).cardColor,
                     ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'About',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+                    ),
+                    SizedBox(height: 8),
+                    ListTile(
+                      tileColor: Theme.of(context).cardColor,
+                      title: Text('Version'),
+                      subtitle: Text('v1.0.1'),
+                      trailing: Icon(Icons.info_rounded),
+                    ),
                   ]),
             ),
           );

@@ -35,7 +35,7 @@ class TodoScreen extends StatelessWidget {
                             return Padding(
                                 padding: const EdgeInsets.only(bottom: 10),
                                 child: TodoCard(
-                                  onLongPress: () {
+                                  onTap: () {
                                     context.read<TodosBloc>().add(EditTodoEvent(
                                         todo: todo, index: index));
                                   },
