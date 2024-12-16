@@ -6,7 +6,7 @@ import 'package:scribble/bloc/notes_bloc/notes_bloc.dart';
 import '../../bloc/todos_bloc/todos_bloc.dart';
 import '../../cubit/settings_cubit.dart';
 import '../../models/settings/settings.dart';
-import '../utils/alert_dialog.dart';
+import '../utils/helper_function.dart/alert_dialog.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
