@@ -73,7 +73,3 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     }
   }
 }
-
-class SecretNotesBloc extends NotesBloc {
-  SecretNotesBloc({required super.hiveDatabase});
-}

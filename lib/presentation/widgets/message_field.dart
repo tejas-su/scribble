@@ -45,7 +45,10 @@ class MessageField extends StatelessWidget {
   /// Label text
   final String? labelText;
 
+  ///Validator: Function(String?)? validator
+  final String? Function(String?)? validator;
   const MessageField({
+    this.validator,
     this.errorText,
     this.labelText,
     this.autofocus = false,
@@ -67,7 +70,8 @@ class MessageField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(padding),
-      child: TextField(
+      child: TextFormField(
+        keyboardAppearance: Theme.of(context).brightness,
         autofocus: autofocus,
         keyboardType: keyboardType,
         obscureText: obscureText,
@@ -78,7 +82,8 @@ class MessageField extends StatelessWidget {
         enableInteractiveSelection: true,
         enableSuggestions: true,
         autocorrect: true,
-        onSubmitted: onComplete,
+        validator: validator,
+        onFieldSubmitted: onComplete,
         style: const TextStyle(fontSize: 18),
         decoration: InputDecoration(
             labelStyle: TextStyle(fontSize: 20),

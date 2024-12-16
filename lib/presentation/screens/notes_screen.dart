@@ -21,9 +21,7 @@ class NotesScreen extends StatelessWidget {
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => const NewNotesScreen(
-                isHomeScreen: true,
-              ),
+              builder: (context) => const NewNotesScreen(),
             ),
           );
         },
@@ -70,7 +68,6 @@ class NotesScreen extends StatelessWidget {
                           onTap: () {
                             Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => UpdateNotesScreen(
-                                isHomeScreen: true,
                                 note: state.note[index],
                                 index: index,
                               ),

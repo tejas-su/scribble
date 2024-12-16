@@ -1,39 +1,32 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import '../models/settings/settings.dart';
+import '../services/settings_database.dart';
 
 class SettingsCubit extends Cubit<Settings> {
-  final bool initialTheme;
-  final bool initialLayout;
-  final Box settingsBox;
+  final HiveSettingsDatabase settingsDatabase;
 
-  SettingsCubit(
-      {required this.initialLayout,
-      required this.initialTheme,
-      required this.settingsBox})
-      : super(Settings(isGrid: initialLayout, isDarkMode: initialTheme));
-
-  List<Settings> _getInitial() {
-    List<Settings> settings = settingsBox.values.toList().cast<Settings>();
-    return settings;
-  }
+  SettingsCubit({
+    required this.settingsDatabase,
+  }) : super(settingsDatabase.getInitialSetting());
 
   void toggleTheme(isDarkMode) {
-    List<Settings> settings = _getInitial();
-    settingsBox.put(
-        0, Settings(isGrid: settings[0].isGrid, isDarkMode: isDarkMode));
+    //Retrive the grid state as we are updating only the theme and not the layout
+    Settings settings = settingsDatabase.getInitialSetting();
+    //Update the values in the database
+    settingsDatabase.putSettingsToBox(
+        isGrid: settings.isGrid, isDarkMode: isDarkMode);
     emit(isDarkMode
-        ? Settings(isGrid: settings[0].isGrid, isDarkMode: true)
-        : Settings(isGrid: settings[0].isGrid, isDarkMode: false));
+        ? Settings(isGrid: settings.isGrid, isDarkMode: true)
+        : Settings(isGrid: settings.isGrid, isDarkMode: false));
   }
 
   void toggleLayout(isGrid) {
-    List<Settings> settings = _getInitial();
+    Settings settings = settingsDatabase.getInitialSetting();
+    settingsDatabase.putSettingsToBox(
+        isGrid: isGrid, isDarkMode: settings.isDarkMode);
 
-    settingsBox.put(
-        0, Settings(isGrid: isGrid, isDarkMode: settings[0].isDarkMode));
     emit(isGrid
-        ? Settings(isGrid: true, isDarkMode: settings[0].isDarkMode)
-        : Settings(isGrid: false, isDarkMode: settings[0].isDarkMode));
+        ? Settings(isGrid: true, isDarkMode: settings.isDarkMode)
+        : Settings(isGrid: false, isDarkMode: settings.isDarkMode));
   }
 }
