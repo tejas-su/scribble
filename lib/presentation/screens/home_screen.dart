@@ -57,6 +57,7 @@ class HomeScreen extends StatelessWidget {
                 ));
               },
               icon: const Icon(Icons.settings_rounded)),
+          SizedBox(width: 8)
         ],
       ),
       body: PageView(

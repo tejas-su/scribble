@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'cubit/bookmark_cubit.dart';
 import 'bloc/todos_bloc/todos_bloc.dart';
 import 'cubit/page_view_cubit.dart';
 import 'cubit/secrets_cubit.dart';
@@ -68,15 +69,20 @@ class MyApp extends StatelessWidget {
           BlocProvider(
             create: (context) => PageViewCubit(),
           ),
+          BlocProvider(
+            create: (context) => BookmarkCubit(),
+          )
         ],
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: lightTheme,
-          darkTheme: darkTheme,
-          themeMode: context.watch<SettingsCubit>().state.isDarkMode
-              ? ThemeMode.dark
-              : ThemeMode.light,
-          home: const HomeScreen(),
+        child: BlocBuilder<SettingsCubit, Settings>(
+          builder: (context, state) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: lightTheme,
+              darkTheme: darkTheme,
+              themeMode: state.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+              home: const HomeScreen(),
+            );
+          },
         ));
   }
 }
