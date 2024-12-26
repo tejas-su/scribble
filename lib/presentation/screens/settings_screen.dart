@@ -135,7 +135,7 @@ class SettingsScreen extends StatelessWidget {
                     ListTile(
                       tileColor: Theme.of(context).cardColor,
                       title: Text('Version'),
-                      subtitle: Text('v1.0.1'),
+                      subtitle: Text('v2.0.0'),
                       trailing: Icon(Icons.info_rounded),
                     ),
                   ]),
