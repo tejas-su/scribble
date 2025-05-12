@@ -4,7 +4,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'cubit/bookmark_cubit.dart';
 import 'bloc/todos_bloc/todos_bloc.dart';
 import 'cubit/page_view_cubit.dart';
-import 'cubit/secrets_cubit.dart';
 import 'cubit/settings_cubit.dart';
 import 'models/notes/notes.dart';
 import 'models/settings/settings.dart';
@@ -63,9 +62,6 @@ class MyApp extends StatelessWidget {
               create: (context) =>
                   TodosBloc(hiveDatabase: HiveTodosDatabase(box: todosBox))
                     ..add(LoadTodoEvent())),
-          BlocProvider(
-            create: (context) => SecretsCubit(),
-          ),
           BlocProvider(
             create: (context) => PageViewCubit(),
           ),
