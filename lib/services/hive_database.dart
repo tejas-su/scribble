@@ -7,7 +7,7 @@ class HiveNotesDatabase {
 
   HiveNotesDatabase({required this.box});
 
-  static openBox(String boxName) async {
+  static Future<Box<Notes>> openBox(String boxName) async {
     Box<Notes> box = await Hive.openBox(boxName);
     return box;
   }
@@ -45,7 +45,7 @@ class HiveNotesDatabase {
 class HiveTodosDatabase {
   late Box box;
   HiveTodosDatabase({required this.box});
-  static openBox(String boxName) async {
+  static Future<Box<Todos>> openBox(String boxName) async {
     Box<Todos> box = await Hive.openBox(boxName);
     return box;
   }

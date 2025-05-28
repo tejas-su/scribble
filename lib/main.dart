@@ -26,7 +26,7 @@ void main() async {
   Hive.registerAdapter(SettingsAdapter());
   Hive.registerAdapter(TodosAdapter());
   //Initialization of boxes (open the box)
-  Box<Notes> notesBox = await HiveNotesDatabase.openBox('notes') as Box<Notes>;
+  Box<Notes> notesBox = await HiveNotesDatabase.openBox('notes');
   Box<Todos> todosBox = await HiveTodosDatabase.openBox('todos');
   Box<Settings> settingsBox = await HiveSettingsDatabase.openBox('settings');
   HiveSettingsDatabase(box: settingsBox).initializeSettings();

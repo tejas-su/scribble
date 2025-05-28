@@ -5,12 +5,12 @@ class HiveSettingsDatabase {
   final Box<Settings> box;
   HiveSettingsDatabase({required this.box});
 
-  static openBox(String boxName) async {
+  static Future<Box<Settings>> openBox(String boxName) async {
     Box<Settings> box = await Hive.openBox<Settings>(boxName);
     return box;
   }
 
-  initializeSettings() {
+  void initializeSettings() {
     if (box.isEmpty) {
       box.put(0, Settings(isGrid: false, isDarkMode: true));
     }

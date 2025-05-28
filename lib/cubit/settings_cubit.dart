@@ -9,7 +9,7 @@ class SettingsCubit extends Cubit<Settings> {
     required this.settingsDatabase,
   }) : super(settingsDatabase.getInitialSetting());
 
-  void toggleTheme(isDarkMode) {
+  void toggleTheme(bool isDarkMode) {
     //Retrive the grid state as we are updating only the theme and not the layout
     Settings settings = settingsDatabase.getInitialSetting();
     //Update the values in the database
@@ -20,7 +20,7 @@ class SettingsCubit extends Cubit<Settings> {
         : Settings(isGrid: settings.isGrid, isDarkMode: false));
   }
 
-  void toggleLayout(isGrid) {
+  void toggleLayout(bool isGrid) {
     Settings settings = settingsDatabase.getInitialSetting();
     settingsDatabase.putSettingsToBox(
         isGrid: isGrid, isDarkMode: settings.isDarkMode);
