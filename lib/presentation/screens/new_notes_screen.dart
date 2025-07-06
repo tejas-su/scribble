@@ -5,13 +5,35 @@ import '../../cubit/bookmark_cubit.dart';
 import '../../bloc/notes_bloc/notes_bloc.dart';
 import '../../models/notes/notes.dart';
 
-class NewNotesScreen extends StatelessWidget {
+class NewNotesScreen extends StatefulWidget {
   const NewNotesScreen({super.key});
 
   @override
+  State<NewNotesScreen> createState() => _NewNotesScreenState();
+}
+
+class _NewNotesScreenState extends State<NewNotesScreen> {
+  @override
+  void initState() {
+    
+    super.initState();
+    titleController = TextEditingController();
+    contentController = TextEditingController();
+  }
+
+  late TextEditingController titleController;
+  late TextEditingController contentController;
+
+  @override
+  void dispose() {
+   
+    super.dispose();
+    titleController.dispose();
+    contentController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final TextEditingController titleController = TextEditingController();
-    final TextEditingController contentController = TextEditingController();
     String date = DateFormat.yMMMEd().format(DateTime.now()).toString();
     return GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
