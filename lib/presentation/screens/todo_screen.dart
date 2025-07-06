@@ -7,12 +7,30 @@ import '/bloc/todos_bloc/todos_bloc.dart';
 import '/presentation/widgets/message_field.dart';
 import '/presentation/widgets/todo_card.dart';
 
-class TodoScreen extends StatelessWidget {
+class TodoScreen extends StatefulWidget {
   const TodoScreen({super.key});
 
   @override
+  State<TodoScreen> createState() => _TodoScreenState();
+}
+
+class _TodoScreenState extends State<TodoScreen> {
+  @override
+  initState() {
+    super.initState();
+    todoController = TextEditingController();
+  }
+
+  late TextEditingController todoController;
+
+  @override
+  void dispose() {
+    super.dispose();
+    todoController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    TextEditingController todoController = TextEditingController();
     String date = DateFormat.yMMMEd().format(DateTime.now()).toString();
     return Scaffold(
       body: Column(

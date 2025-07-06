@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import '../../bloc/notes_bloc/notes_bloc.dart';
 import '../../models/notes/notes.dart';
 
-class UpdateNotesScreen extends StatelessWidget {
+class UpdateNotesScreen extends StatefulWidget {
   final Notes note;
   final int index;
 
@@ -15,12 +15,32 @@ class UpdateNotesScreen extends StatelessWidget {
   });
 
   @override
+  State<UpdateNotesScreen> createState() => _UpdateNotesScreenState();
+}
+
+class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
+  @override
+  void initState() {
+    super.initState();
+    titleController = TextEditingController(text: widget.note.title);
+    contentController = TextEditingController(text: widget.note.content);
+  }
+
+  late TextEditingController titleController;
+
+  late TextEditingController contentController;
+
+  @override
+  void dispose() {
+    super.dispose();
+    titleController.dispose();
+    contentController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     String date = DateFormat.yMMMEd().format(DateTime.now()).toString();
-    final TextEditingController titleController =
-        TextEditingController(text: note.title);
-    final TextEditingController contentController =
-        TextEditingController(text: note.content);
+
     //To listen to changes of bookmark state and build the ui as necessary
     final notesLoadedState =
         context.watch<NotesBloc>().state as NotesLoadedState;
@@ -36,10 +56,11 @@ class UpdateNotesScreen extends StatelessWidget {
                   title: titleController.text,
                   date: date.toString(),
                   content: contentController.text,
-                  isBookmarked: notesLoadedState.note[index].isBookmarked);
+                  isBookmarked:
+                      notesLoadedState.note[widget.index].isBookmarked);
               context
                   .read<NotesBloc>()
-                  .add(UpdateNotesEvent(notes: notes, index: index));
+                  .add(UpdateNotesEvent(notes: notes, index: widget.index));
             },
             child: Scaffold(
               appBar: AppBar(
@@ -48,12 +69,12 @@ class UpdateNotesScreen extends StatelessWidget {
                   IconButton(
                     onPressed: () {
                       context.read<NotesBloc>().add(UpdateNotesEvent(
-                          notes: note.copyWith(
-                              isBookmarked:
-                                  !notesLoadedState.note[index].isBookmarked),
-                          index: index));
+                          notes: widget.note.copyWith(
+                              isBookmarked: !notesLoadedState
+                                  .note[widget.index].isBookmarked),
+                          index: widget.index));
                     },
-                    icon: notesLoadedState.note[index].isBookmarked
+                    icon: notesLoadedState.note[widget.index].isBookmarked
                         ? Icon(Icons.bookmark_rounded)
                         : Icon(Icons.bookmark_outline_rounded),
                   )
@@ -85,7 +106,7 @@ class UpdateNotesScreen extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(left: 20),
                       child: Text(
-                        note.date,
+                        widget.note.date,
                         style: TextStyle(
                             color:
                                 Theme.of(context).textTheme.titleMedium?.color,
