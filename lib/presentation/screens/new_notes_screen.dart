@@ -15,7 +15,6 @@ class NewNotesScreen extends StatefulWidget {
 class _NewNotesScreenState extends State<NewNotesScreen> {
   @override
   void initState() {
-    
     super.initState();
     titleController = TextEditingController();
     contentController = TextEditingController();
@@ -26,10 +25,9 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
 
   @override
   void dispose() {
-   
-    super.dispose();
     titleController.dispose();
     contentController.dispose();
+    super.dispose();
   }
 
   @override
