@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import '../../models/notes/notes.dart';
-import '../../services/hive_database.dart';
+import '../../../data/notes/notes.dart';
+import '../../../data/services/hive_notes_database.dart';
 part 'notes_event.dart';
 part 'notes_state.dart';
 

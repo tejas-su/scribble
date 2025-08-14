@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'cubit/bookmark_cubit.dart';
-import 'bloc/todos_bloc/todos_bloc.dart';
-import 'cubit/page_view_cubit.dart';
-import 'cubit/settings_cubit.dart';
-import 'models/notes/notes.dart';
-import 'models/settings/settings.dart';
-import 'bloc/notes_bloc/notes_bloc.dart';
-import 'models/todos/todos.dart';
-import 'presentation/utils/themes/themes.dart';
-import 'presentation/screens/home_screen.dart';
+import 'src/features/notes/presentation/bloc/bookmark_cubit.dart';
+import 'src/features/todos/presentation/bloc/todos_bloc/todos_bloc.dart';
+import 'src/features/notes/presentation/bloc/page_view_cubit.dart';
+import 'src/features/settings/presentation/bloc/settings_cubit.dart';
+import 'src/features/notes/data/notes/notes.dart';
+import 'src/features/settings/data/models/settings/settings.dart';
+import 'src/features/notes/presentation/bloc/notes_bloc/notes_bloc.dart';
+import 'src/features/todos/data/models/todos/todos.dart';
+import 'src/core/themes/themes.dart';
+import 'src/home_screen.dart';
 import 'package:path_provider/path_provider.dart';
-import 'services/hive_database.dart';
-import 'services/settings_database.dart';
+import 'src/features/notes/data/services/hive_notes_database.dart';
+import 'src/features/settings/data/services/settings_database.dart';
+import 'src/features/todos/data/services/hive_todos_database.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

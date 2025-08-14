@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../bloc/notes_bloc/notes_bloc.dart';
-import '../../models/notes/notes.dart';
+import '../bloc/notes_bloc/notes_bloc.dart';
+import '../../data/notes/notes.dart';
 
 class UpdateNotesScreen extends StatefulWidget {
   final Notes note;

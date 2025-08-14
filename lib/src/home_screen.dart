@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:scribble/presentation/screens/settings_screen.dart';
-import '../../cubit/page_view_cubit.dart';
-import 'notes_screen.dart';
-import 'todo_screen.dart';
+import 'package:scribble/src/features/settings/presentation/screen/settings_screen.dart';
+import 'features/notes/presentation/bloc/page_view_cubit.dart';
+import 'features/notes/presentation/screen/notes_screen.dart';
+import 'features/todos/presentation/screen/todo_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

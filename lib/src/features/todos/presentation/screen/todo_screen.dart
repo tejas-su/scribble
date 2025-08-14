@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
-import '../../models/todos/todos.dart';
-import '/bloc/todos_bloc/todos_bloc.dart';
-import '/presentation/widgets/message_field.dart';
-import '/presentation/widgets/todo_card.dart';
+import '../../data/models/todos/todos.dart';
+import '../bloc/todos_bloc/todos_bloc.dart';
+import '../../../../core/widgets/message_field.dart';
+import '../widgets/todo_card.dart';
 
 class TodoScreen extends StatefulWidget {
   const TodoScreen({super.key});

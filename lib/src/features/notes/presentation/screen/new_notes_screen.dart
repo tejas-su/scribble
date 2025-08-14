@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../cubit/bookmark_cubit.dart';
-import '../../bloc/notes_bloc/notes_bloc.dart';
-import '../../models/notes/notes.dart';
+import '../bloc/bookmark_cubit.dart';
+import '../bloc/notes_bloc/notes_bloc.dart';
+import '../../data/notes/notes.dart';
 
 class NewNotesScreen extends StatefulWidget {
   const NewNotesScreen({super.key});

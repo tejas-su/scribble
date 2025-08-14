@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../models/todos/todos.dart';
-import '../../services/hive_database.dart';
+import '../../../data/models/todos/todos.dart';
+import '../../../data/services/hive_todos_database.dart';
 part 'todos_event.dart';
 part 'todos_state.dart';
 

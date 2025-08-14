@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../models/settings/settings.dart';
-import '../services/settings_database.dart';
+import '../../data/models/settings/settings.dart';
+import '../../data/services/settings_database.dart';
 
 class SettingsCubit extends Cubit<Settings> {
   final HiveSettingsDatabase settingsDatabase;

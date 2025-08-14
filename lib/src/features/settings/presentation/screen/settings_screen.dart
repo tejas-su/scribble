@@ -2,11 +2,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:scribble/bloc/notes_bloc/notes_bloc.dart';
-import '../../bloc/todos_bloc/todos_bloc.dart';
-import '../../cubit/settings_cubit.dart';
-import '../../models/settings/settings.dart';
-import '../utils/helper_function.dart/alert_dialog.dart';
+import 'package:scribble/src/features/notes/presentation/bloc/notes_bloc/notes_bloc.dart';
+import '../../../todos/presentation/bloc/todos_bloc/todos_bloc.dart';
+import '../bloc/settings_cubit.dart';
+import '../../data/models/settings/settings.dart';
+import '../../../../core/utils/alert_dialog.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
