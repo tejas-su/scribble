@@ -26,19 +26,29 @@ class NotesCard extends StatelessWidget {
   //Icon: optional
   final IconData? icon;
 
-  const NotesCard(
-      {super.key,
-      this.icon,
-      required this.onPressedSlidable,
-      required this.onDismissed,
-      this.title = '',
-      this.date = '',
-      this.content = '',
-      required this.onTap});
+  //On long press action
+  final Function()? onLongPress;
+
+  ///Is selected, whether this card is selected or not
+  final bool isSelected;
+
+  const NotesCard({
+    super.key,
+    this.icon,
+    required this.onPressedSlidable,
+    required this.onDismissed,
+    this.onLongPress,
+    this.title = '',
+    this.date = '',
+    this.content = '',
+    this.isSelected = false,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onLongPress: onLongPress,
       onTap: onTap,
       child: Slidable(
         key: const ValueKey(0),
@@ -72,7 +82,7 @@ class NotesCard extends StatelessWidget {
             width: MediaQuery.sizeOf(context).width,
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(10)),
-              color: Theme.of(context).cardColor,
+              color:isSelected?Theme.of(context).listTileTheme.selectedTileColor: Theme.of(context).cardColor,
             ),
             child: Padding(
               padding: const EdgeInsets.all(14.0),

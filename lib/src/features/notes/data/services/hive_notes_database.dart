@@ -1,5 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:scribble/src/features/notes/data/notes/notes.dart';
+import 'package:scribble/src/features/notes/data/models/notes/notes.dart';
 
 class HiveNotesDatabase {
   final Box<Notes> box;
@@ -40,5 +40,3 @@ class HiveNotesDatabase {
     }
   }
 }
-
-

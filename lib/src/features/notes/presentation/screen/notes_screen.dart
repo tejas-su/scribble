@@ -3,8 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:lottie/lottie.dart';
 import '../../../settings/presentation/bloc/settings_cubit.dart';
-import '../../data/notes/notes.dart';
-import '../../../settings/data/models/settings/settings.dart';
+import '../../data/models/notes/notes.dart';
 import '../bloc/notes_bloc/notes_bloc.dart';
 import '../widgets/notes_card.dart';
 import 'new_notes_screen.dart';
@@ -41,64 +40,120 @@ class NotesScreen extends StatelessWidget {
                 color: Theme.of(context).textTheme.titleLarge?.color,
               )),
             //Loaded state
-            NotesLoadedState() => BlocBuilder<SettingsCubit, Settings>(
-                builder: (context, layout) {
-                  if (state.note.isNotEmpty) {
-                    return MasonryGridView.builder(
-                      gridDelegate:
-                          SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: layout.isGrid ? 2 : 1),
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      padding: const EdgeInsets.all(18),
-                      itemCount: state.note.length,
-                      itemBuilder: (context, index) {
-                        Notes notes = state.note[index]; //index position
-                        return NotesCard(
-                          onPressedSlidable: (context) {
-                            context
-                                .read<NotesBloc>()
-                                .add(DeleteNotesEvent(index: index));
-                          },
-                          onDismissed: () {
-                            context
-                                .read<NotesBloc>()
-                                .add(DeleteNotesEvent(index: index));
-                          },
-                          onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => UpdateNotesScreen(
-                                note: state.note[index],
-                                index: index,
-                              ),
-                            ));
-                          },
-                          icon: state.note[index].isBookmarked
-                              ? Icons.bookmark_rounded
-                              : null,
-                          date: notes.date,
-                          title: notes.title,
-                          content: notes.content,
-                        );
-                      },
-                    );
-                  } else {
-                    return Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Lottie.asset('assets/lottie/empty_list.json'),
-                          Text(
-                            'Everything looks empty here !',
-                            style: TextStyle(fontSize: 20),
+            NotesLoadedState() => Column(
+                children: [
+                  state.isSelecting
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                  iconSize: 25,
+                                  onPressed: () => context
+                                      .read<NotesBloc>()
+                                      .add(SelectAllNotesEvent()),
+                                  icon: Icon(
+                                    Icons.select_all_rounded,
+                                  )),
+                              Expanded(child: SizedBox()),
+                              IconButton(
+                                  iconSize: 22,
+                                  onPressed: null,
+                                  icon: Icon(Icons.delete_rounded)),
+                              IconButton(
+                                  iconSize: 20,
+                                  onPressed: null,
+                                  icon: Icon(Icons.share_rounded)),
+                              IconButton(
+                                  iconSize: 25,
+                                  onPressed: () => context
+                                      .read<NotesBloc>()
+                                      .add(DeSelectAllNotesEvent()),
+                                  icon: Icon(
+                                    Icons.close,
+                                  )),
+                            ],
                           ),
-                        ],
-                      ),
-                    );
-                  }
-                },
+                        )
+                      : SizedBox.shrink(),
+                  state.note.isNotEmpty
+                      ? Expanded(
+                          child: MasonryGridView.builder(
+                            gridDelegate:
+                                SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: context
+                                            .watch<SettingsCubit>()
+                                            .state
+                                            .isGrid
+                                        ? 2
+                                        : 1),
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            padding: const EdgeInsets.all(18),
+                            itemCount: state.note.length,
+                            itemBuilder: (context, index) {
+                              Notes notes = state.note[index]; //index position
+                              return NotesCard(
+                                isSelected: notes.isSelected,
+                                onLongPress: () => context
+                                    .read<NotesBloc>()
+                                    .add(SelectNotesEvent(
+                                      isSelected: !notes.isSelected,
+                                      index: index,
+                                      note: notes,
+                                    )),
+                                onPressedSlidable: (context) {
+                                  // context
+                                  //     .read<NotesBloc>()
+                                  //     .add(DeleteNotesEvent(index: index));
+                                },
+                                onDismissed: () {
+                                  // context
+                                  //     .read<NotesBloc>()
+                                  //     .add(DeleteNotesEvent(index: index));
+                                },
+                                onTap: () {
+                                  state.isSelecting
+                                      ? context.read<NotesBloc>().add(
+                                          SelectNotesEvent(
+                                              note: notes,
+                                              index: index,
+                                              isSelected: !notes.isSelected))
+                                      : Navigator.of(context)
+                                          .push(MaterialPageRoute(
+                                          builder: (context) =>
+                                              UpdateNotesScreen(
+                                            note: notes,
+                                            index: index,
+                                          ),
+                                        ));
+                                },
+                                icon: state.note[index].isBookmarked
+                                    ? Icons.bookmark_rounded
+                                    : null,
+                                date: notes.date,
+                                title: notes.title,
+                                content: notes.content,
+                              );
+                            },
+                          ),
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Lottie.asset('assets/lottie/empty_list.json'),
+                              Text(
+                                'Everything looks empty here !',
+                                style: TextStyle(fontSize: 20),
+                              ),
+                            ],
+                          ),
+                        ),
+                ],
               ),
+
             //Error state
             NotesErrorState() => Padding(
                 padding: const EdgeInsets.all(20.0),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 final darkTheme = ThemeData(
+    listTileTheme: ListTileThemeData(selectedTileColor: Color(0xFF2a2a2a)),
     cardColor: const Color(0xFF1c1c1c),
     floatingActionButtonTheme:
         const FloatingActionButtonThemeData(backgroundColor: Color(0xFF395886)),
@@ -10,6 +11,7 @@ final darkTheme = ThemeData(
     brightness: Brightness.dark);
 
 final lightTheme = ThemeData(
+  listTileTheme: ListTileThemeData(selectedTileColor: Color(0xFFede6e6)),
   scaffoldBackgroundColor: Color(0xFFFAFAFA),
   cardColor: const Color(0xFFF7F0F0),
   colorScheme: ColorScheme.fromSeed(

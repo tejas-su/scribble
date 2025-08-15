@@ -7,6 +7,7 @@ part 'notes.g.dart';
 //to generate the code run => dart run build_runner build
 @HiveType(typeId: 1)
 class Notes extends Equatable {
+  final bool isSelected;
   @HiveField(0)
   final String title;
   @HiveField(1)
@@ -17,6 +18,7 @@ class Notes extends Equatable {
   final bool isBookmarked;
   @HiveField(3)
   const Notes({
+    this.isSelected = false,
     this.isBookmarked = false,
     required this.title,
     required this.date,
@@ -24,19 +26,20 @@ class Notes extends Equatable {
   });
 
   @override
-  List<Object?> get props => [title, date, content, isBookmarked];
+  List<Object?> get props => [title, date, content, isBookmarked, isSelected];
 
-  Notes copyWith({
-    String? title,
-    String? date,
-    String? content,
-    bool? isBookmarked,
-  }) {
+  Notes copyWith(
+      {String? title,
+      String? date,
+      String? content,
+      bool? isBookmarked,
+      bool? isSelected}) {
     return Notes(
       title: title ?? this.title,
       date: date ?? this.date,
       content: content ?? this.content,
       isBookmarked: isBookmarked ?? this.isBookmarked,
+      isSelected: isSelected ?? this.isSelected,
     );
   }
 }

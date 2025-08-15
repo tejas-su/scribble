@@ -7,20 +7,19 @@ sealed class NotesState extends Equatable {
   List<Object> get props => [];
 }
 
-class NotesLoadingState extends NotesState {}
+final class NotesLoadingState extends NotesState {}
 
-class NotesLoadedState extends NotesState {
+final class NotesLoadedState extends NotesState {
   final List<Notes> note;
+  final bool isSelecting;
 
-  const NotesLoadedState({
-    required this.note,
-  });
+  const NotesLoadedState({required this.note, this.isSelecting = false});
 
   @override
-  List<Object> get props => [note];
+  List<Object> get props => [note, isSelecting];
 }
 
-class NotesErrorState extends NotesState {
+final class NotesErrorState extends NotesState {
   final String errorMessage;
   const NotesErrorState({required this.errorMessage});
 
