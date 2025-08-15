@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:scribble/src/core/utils/share_plus_util.dart';
 import '../bloc/notes_bloc/notes_bloc.dart';
 import '../../data/notes/notes.dart';
 
@@ -77,7 +78,15 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
                     icon: notesLoadedState.note[widget.index].isBookmarked
                         ? Icon(Icons.bookmark_rounded)
                         : Icon(Icons.bookmark_outline_rounded),
-                  )
+                  ),
+                  IconButton(
+                      onPressed: () async {
+                        await shareNote(
+                          title: widget.note.title,
+                          content: widget.note.content,
+                        );
+                      },
+                      icon: Icon(Icons.share_rounded))
                 ],
               ),
               body: SingleChildScrollView(
