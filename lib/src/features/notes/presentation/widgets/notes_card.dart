@@ -32,6 +32,9 @@ class NotesCard extends StatelessWidget {
   ///Is selected, whether this card is selected or not
   final bool isSelected;
 
+  ///To fetch the details of the user tapped position
+  final Function(TapDownDetails)? onTapDown;
+
   const NotesCard({
     super.key,
     this.icon,
@@ -43,11 +46,13 @@ class NotesCard extends StatelessWidget {
     this.content = '',
     this.isSelected = false,
     required this.onTap,
+    this.onTapDown,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onTapDown: onTapDown,
       onLongPress: onLongPress,
       onTap: onTap,
       child: Slidable(
@@ -81,8 +86,11 @@ class NotesCard extends StatelessWidget {
             //to its full screen width
             width: MediaQuery.sizeOf(context).width,
             decoration: BoxDecoration(
+              border: Border.all(color: Theme.of(context).dividerColor),
               borderRadius: const BorderRadius.all(Radius.circular(10)),
-              color:isSelected?Theme.of(context).listTileTheme.selectedTileColor: Theme.of(context).cardColor,
+              color: isSelected
+                  ? Theme.of(context).listTileTheme.selectedTileColor
+                  : Theme.of(context).cardColor,
             ),
             child: Padding(
               padding: const EdgeInsets.all(14.0),

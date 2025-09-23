@@ -18,6 +18,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     on<SelectNotesEvent>(_selectNote);
     on<SelectAllNotesEvent>(_selectAll);
     on<DeSelectAllNotesEvent>(_deSelect);
+    on<DeleteSelectedNotes>(_deleteSelected);
   }
   //load the notes
   void _onLoadNotes(LoadNotesEvent event, Emitter<NotesState> emit) {
@@ -111,6 +112,21 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
       for (int index = 0; index < notes.length; index++) {
         await hiveDatabase.updateNotes(
             index, notes[index].copyWith(isSelected: false));
+      }
+      emit(NotesLoadedState(note: hiveDatabase.getNotes(), isSelecting: false));
+    } catch (e) {
+      emit(NotesErrorState(errorMessage: e.toString()));
+    }
+  }
+
+  FutureOr<void> _deleteSelected(
+      DeleteSelectedNotes event, Emitter<NotesState> emit) async {
+    try {
+      List<dynamic> keys = hiveDatabase.getKeys();
+      for (int index = 0; index < event.notes.length; index++) {
+        if (event.notes[index].isSelected == true) {
+          await hiveDatabase.deleteKeys(keys[index]);
+        }
       }
       emit(NotesLoadedState(note: hiveDatabase.getNotes(), isSelecting: false));
     } catch (e) {

@@ -53,3 +53,12 @@ class SelectNotesEvent extends NotesEvent {
 class SelectAllNotesEvent extends NotesEvent {}
 
 class DeSelectAllNotesEvent extends NotesEvent {}
+
+final class DeleteSelectedNotes extends NotesEvent {
+  final List<Notes> notes;
+
+  const DeleteSelectedNotes({required this.notes});
+
+  @override
+  List<Object> get props => [notes];
+}

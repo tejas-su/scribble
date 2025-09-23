@@ -39,4 +39,12 @@ class HiveNotesDatabase {
       throw Exception(e);
     }
   }
+
+  Future<void> deleteKeys(dynamic key) async {
+    await box.delete(key);
+  }
+
+  List<dynamic> getKeys() {
+    return box.keys.toList();
+  }
 }

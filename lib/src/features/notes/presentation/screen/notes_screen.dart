@@ -14,6 +14,12 @@ class NotesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Offset? tapPosition;
+
+    void storePosition(TapDownDetails tapDownDetails) {
+      tapPosition = tapDownDetails.globalPosition;
+    }
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         elevation: 0,
@@ -58,7 +64,10 @@ class NotesScreen extends StatelessWidget {
                               Expanded(child: SizedBox()),
                               IconButton(
                                   iconSize: 22,
-                                  onPressed: null,
+                                  onPressed: () => context
+                                      .read<NotesBloc>()
+                                      .add(DeleteSelectedNotes(
+                                          notes: state.note)),
                                   icon: Icon(Icons.delete_rounded)),
                               IconButton(
                                   iconSize: 20,
@@ -94,14 +103,56 @@ class NotesScreen extends StatelessWidget {
                             itemBuilder: (context, index) {
                               Notes notes = state.note[index]; //index position
                               return NotesCard(
+                                onTapDown: storePosition,
                                 isSelected: notes.isSelected,
-                                onLongPress: () => context
-                                    .read<NotesBloc>()
-                                    .add(SelectNotesEvent(
-                                      isSelected: !notes.isSelected,
-                                      index: index,
-                                      note: notes,
-                                    )),
+                                onLongPress: () {
+                                  if (tapPosition == null) {
+                                    return;
+                                  }
+                                  context.read<NotesBloc>().add(
+                                      SelectNotesEvent(
+                                          note: notes,
+                                          index: index,
+                                          isSelected: !notes.isSelected));
+                                  showMenu(
+                                      positionBuilder: (context, constraints) {
+                                        return RelativeRect.fromLTRB(
+                                            tapPosition!.dx,
+                                            tapPosition!.dy,
+                                            MediaQuery.sizeOf(context).width -
+                                                tapPosition!.dx,
+                                            MediaQuery.sizeOf(context).width -
+                                                tapPosition!.dy);
+                                      },
+                                      popUpAnimationStyle: AnimationStyle(
+                                          curve: Curves.bounceIn),
+                                      menuPadding: EdgeInsets.all(8),
+                                      elevation: 1,
+                                      context: context,
+                                      items: [
+                                        PopupMenuItem(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          enabled: true,
+                                          value: 'delete',
+                                          child: Text('Delete'),
+                                        ),
+                                        PopupMenuItem(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          enabled: true,
+                                          value: 'share',
+                                          child: Text('Share'),
+                                        ),
+                                        PopupMenuItem(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          enabled: true,
+                                          value: 'bookmark',
+                                          child: Text('Bookmark'),
+                                        )
+                                      ]);
+                                },
                                 onPressedSlidable: (context) {
                                   // context
                                   //     .read<NotesBloc>()
@@ -138,17 +189,19 @@ class NotesScreen extends StatelessWidget {
                             },
                           ),
                         )
-                      : Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Lottie.asset('assets/lottie/empty_list.json'),
-                              Text(
-                                'Everything looks empty here !',
-                                style: TextStyle(fontSize: 20),
-                              ),
-                            ],
+                      : Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Lottie.asset('assets/lottie/empty_list.json'),
+                                Text(
+                                  'Everything looks empty here !',
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                 ],
