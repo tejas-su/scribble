@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../data/models/notes/notes.dart';
@@ -15,10 +13,6 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     on<UpdateNotesEvent>(_onUpdateNotes);
     on<DeleteNotesEvent>(_onDelteNotes);
     on<DeleteAllNotesevent>(_deleteAllNotes);
-    on<SelectNotesEvent>(_selectNote);
-    on<SelectAllNotesEvent>(_selectAll);
-    on<DeSelectAllNotesEvent>(_deSelect);
-    on<DeleteSelectedNotes>(_deleteSelected);
   }
   //load the notes
   void _onLoadNotes(LoadNotesEvent event, Emitter<NotesState> emit) {
@@ -76,61 +70,6 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     } catch (e) {
       emit(NotesErrorState(
           errorMessage: 'Something went wrong!\n ${e.toString()}'));
-    }
-  }
-
-  void _selectNote(SelectNotesEvent event, Emitter<NotesState> emit) async {
-    try {
-      await hiveDatabase.updateNotes(
-          event.index, event.note.copyWith(isSelected: event.isSelected));
-      emit(NotesLoadedState(note: hiveDatabase.getNotes(), isSelecting: true));
-    } catch (e) {
-      emit(NotesErrorState(errorMessage: e.toString()));
-    }
-  }
-
-  FutureOr<void> _selectAll(
-      SelectAllNotesEvent event, Emitter<NotesState> emit) async {
-    try {
-      List<Notes> notes = hiveDatabase.getNotes();
-
-      for (int index = 0; index < notes.length; index++) {
-        await hiveDatabase.updateNotes(
-            index, notes[index].copyWith(isSelected: true));
-      }
-      emit(NotesLoadedState(note: hiveDatabase.getNotes(), isSelecting: true));
-    } catch (e) {
-      emit(NotesErrorState(errorMessage: e.toString()));
-    }
-  }
-
-  FutureOr<void> _deSelect(
-      DeSelectAllNotesEvent event, Emitter<NotesState> emit) async {
-    try {
-      List<Notes> notes = hiveDatabase.getNotes();
-
-      for (int index = 0; index < notes.length; index++) {
-        await hiveDatabase.updateNotes(
-            index, notes[index].copyWith(isSelected: false));
-      }
-      emit(NotesLoadedState(note: hiveDatabase.getNotes(), isSelecting: false));
-    } catch (e) {
-      emit(NotesErrorState(errorMessage: e.toString()));
-    }
-  }
-
-  FutureOr<void> _deleteSelected(
-      DeleteSelectedNotes event, Emitter<NotesState> emit) async {
-    try {
-      List<dynamic> keys = hiveDatabase.getKeys();
-      for (int index = 0; index < event.notes.length; index++) {
-        if (event.notes[index].isSelected == true) {
-          await hiveDatabase.deleteKeys(keys[index]);
-        }
-      }
-      emit(NotesLoadedState(note: hiveDatabase.getNotes(), isSelecting: false));
-    } catch (e) {
-      emit(NotesErrorState(errorMessage: e.toString()));
     }
   }
 }

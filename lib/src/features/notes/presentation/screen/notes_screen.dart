@@ -48,43 +48,6 @@ class NotesScreen extends StatelessWidget {
             //Loaded state
             NotesLoadedState() => Column(
                 children: [
-                  state.isSelecting
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Row(
-                            children: [
-                              IconButton(
-                                  iconSize: 25,
-                                  onPressed: () => context
-                                      .read<NotesBloc>()
-                                      .add(SelectAllNotesEvent()),
-                                  icon: Icon(
-                                    Icons.select_all_rounded,
-                                  )),
-                              Expanded(child: SizedBox()),
-                              IconButton(
-                                  iconSize: 22,
-                                  onPressed: () => context
-                                      .read<NotesBloc>()
-                                      .add(DeleteSelectedNotes(
-                                          notes: state.note)),
-                                  icon: Icon(Icons.delete_rounded)),
-                              IconButton(
-                                  iconSize: 20,
-                                  onPressed: null,
-                                  icon: Icon(Icons.share_rounded)),
-                              IconButton(
-                                  iconSize: 25,
-                                  onPressed: () => context
-                                      .read<NotesBloc>()
-                                      .add(DeSelectAllNotesEvent()),
-                                  icon: Icon(
-                                    Icons.close,
-                                  )),
-                            ],
-                          ),
-                        )
-                      : SizedBox.shrink(),
                   state.note.isNotEmpty
                       ? Expanded(
                           child: MasonryGridView.builder(
@@ -109,11 +72,6 @@ class NotesScreen extends StatelessWidget {
                                   if (tapPosition == null) {
                                     return;
                                   }
-                                  context.read<NotesBloc>().add(
-                                      SelectNotesEvent(
-                                          note: notes,
-                                          index: index,
-                                          isSelected: !notes.isSelected));
                                   showMenu(
                                       positionBuilder: (context, constraints) {
                                         return RelativeRect.fromLTRB(
@@ -134,8 +92,19 @@ class NotesScreen extends StatelessWidget {
                                           padding: EdgeInsets.symmetric(
                                               horizontal: 8),
                                           enabled: true,
+                                          onTap: () => context
+                                              .read<NotesBloc>()
+                                              .add(DeleteNotesEvent(
+                                                  index: index)),
                                           value: 'delete',
                                           child: Text('Delete'),
+                                        ),
+                                        PopupMenuItem(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          enabled: true,
+                                          value: 'archive',
+                                          child: Text('Archive'),
                                         ),
                                         PopupMenuItem(
                                           padding: EdgeInsets.symmetric(
@@ -144,13 +113,6 @@ class NotesScreen extends StatelessWidget {
                                           value: 'share',
                                           child: Text('Share'),
                                         ),
-                                        PopupMenuItem(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 8),
-                                          enabled: true,
-                                          value: 'bookmark',
-                                          child: Text('Bookmark'),
-                                        )
                                       ]);
                                 },
                                 onPressedSlidable: (context) {
@@ -164,20 +126,12 @@ class NotesScreen extends StatelessWidget {
                                   //     .add(DeleteNotesEvent(index: index));
                                 },
                                 onTap: () {
-                                  state.isSelecting
-                                      ? context.read<NotesBloc>().add(
-                                          SelectNotesEvent(
-                                              note: notes,
-                                              index: index,
-                                              isSelected: !notes.isSelected))
-                                      : Navigator.of(context)
-                                          .push(MaterialPageRoute(
-                                          builder: (context) =>
-                                              UpdateNotesScreen(
-                                            note: notes,
-                                            index: index,
-                                          ),
-                                        ));
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => UpdateNotesScreen(
+                                      note: notes,
+                                      index: index,
+                                    ),
+                                  ));
                                 },
                                 icon: state.note[index].isBookmarked
                                     ? Icons.bookmark_rounded

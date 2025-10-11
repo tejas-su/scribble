@@ -119,11 +119,33 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 20),
-                    child: Text(
-                      widget.note.date,
-                      style: TextStyle(
-                          color: Theme.of(context).textTheme.titleMedium?.color,
-                          fontSize: 15),
+                    child: Row(
+                      spacing: 10,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.note.date,
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.color,
+                              fontSize: 15),
+                        ),
+                        Text('|'),
+                        ValueListenableBuilder(
+                          valueListenable: contentController,
+                          builder: (context, value, child) => Text(
+                            "${value.text.length} characters",
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.color,
+                                fontSize: 15),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   TextField(

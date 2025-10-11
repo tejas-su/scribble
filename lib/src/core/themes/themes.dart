@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 final darkTheme = ThemeData(
-    dividerColor: Color(0xff2e2e2e),
-    scaffoldBackgroundColor: Color(0xFF09090b),
+    dividerColor: Color(0xff2c2c2c),
+    scaffoldBackgroundColor: Color(0xFF121212),
     listTileTheme: ListTileThemeData(selectedTileColor: Color(0xFF27272a)),
-    cardColor: const Color(0xFF18181b),
+    cardColor: const Color(0xFF1e1e1e),
     floatingActionButtonTheme:
         const FloatingActionButtonThemeData(backgroundColor: Color(0xFF395886)),
     colorScheme: ColorScheme.fromSeed(
