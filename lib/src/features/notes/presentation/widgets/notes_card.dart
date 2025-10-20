@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 
 class NotesCard extends StatelessWidget {
   /// On tap function: When the user taps on the card
