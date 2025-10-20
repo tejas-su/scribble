@@ -90,11 +90,10 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
                     maxLines: 3,
                     maxLength: 55,
                     buildCounter: (context,
-                        {required currentLength,
-                        required isFocused,
-                        required maxLength}) {
-                      return SizedBox.shrink();
-                    },
+                            {required currentLength,
+                            required isFocused,
+                            required maxLength}) =>
+                        null,
                     focusNode: titleFocusNode,
                     onEditingComplete: () => contentFocusNode.nextFocus(),
                     onTapOutside: (event) => contentFocusNode.nextFocus(),
@@ -105,7 +104,7 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
                         fontSize: 30),
                     decoration: const InputDecoration(
                       contentPadding: EdgeInsets.all(20),
-                      hintText: 'Title 👀',
+                      hintText: 'Title',
                       hintStyle: TextStyle(
                         fontSize: 30,
                       ),
@@ -114,9 +113,33 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 20),
-                    child: Text(
-                      date,
-                      style: const TextStyle(fontSize: 15),
+                    child: Row(
+                      spacing: 10,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          date,
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.color,
+                              fontSize: 15),
+                        ),
+                        Text('|'),
+                        ValueListenableBuilder(
+                          valueListenable: contentController,
+                          builder: (context, value, child) => Text(
+                            "${value.text.length} characters",
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.color,
+                                fontSize: 15),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   TextField(

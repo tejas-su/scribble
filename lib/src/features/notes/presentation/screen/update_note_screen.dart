@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:scribble/src/core/utils/share_plus_util.dart';
@@ -103,6 +104,12 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
                     keyboardAppearance: Theme.of(context).brightness,
                     minLines: 1,
                     maxLines: 3,
+                    maxLength: 55,
+                    buildCounter: (context,
+                            {required currentLength,
+                            required isFocused,
+                            required maxLength}) =>
+                        null,
                     controller: titleController,
                     style: TextStyle(
                         fontWeight: FontWeight.w500,

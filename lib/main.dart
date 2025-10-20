@@ -10,7 +10,7 @@ import 'src/features/settings/data/models/settings/settings.dart';
 import 'src/features/notes/presentation/bloc/notes_bloc/notes_bloc.dart';
 import 'src/features/todos/data/models/todos/todos.dart';
 import 'src/core/themes/themes.dart';
-import 'src/features/notes/presentation/screen/home_screen.dart';
+import 'src/home_screen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'src/features/notes/data/services/hive_notes_database.dart';
 import 'src/features/settings/data/services/settings_database.dart';

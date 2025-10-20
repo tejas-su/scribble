@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:lottie/lottie.dart';
+import '../../../../core/utils/share_plus_util.dart';
 import '../../../settings/presentation/bloc/settings_cubit.dart';
 import '../../data/models/notes/notes.dart';
 import '../bloc/notes_bloc/notes_bloc.dart';
@@ -64,10 +65,9 @@ class NotesScreen extends StatelessWidget {
                             padding: const EdgeInsets.all(18),
                             itemCount: state.note.length,
                             itemBuilder: (context, index) {
-                              Notes notes = state.note[index]; //index position
+                              Notes note = state.note[index]; //index position
                               return NotesCard(
                                 onTapDown: storePosition,
-                                isSelected: notes.isSelected,
                                 onLongPress: () {
                                   if (tapPosition == null) {
                                     return;
@@ -103,42 +103,46 @@ class NotesScreen extends StatelessWidget {
                                           padding: EdgeInsets.symmetric(
                                               horizontal: 8),
                                           enabled: true,
-                                          value: 'archive',
-                                          child: Text('Archive'),
+                                          onTap: () {
+                                            context.read<NotesBloc>().add(
+                                                UpdateNotesEvent(
+                                                    notes: note.copyWith(
+                                                        isBookmarked:
+                                                            !note.isBookmarked),
+                                                    index: index));
+                                          },
+                                          value: 'bookmark',
+                                          child: Text('Bookmark'),
                                         ),
                                         PopupMenuItem(
                                           padding: EdgeInsets.symmetric(
                                               horizontal: 8),
                                           enabled: true,
                                           value: 'share',
+                                          onTap: () async {
+                                            await shareNote(
+                                              title: note.title,
+                                              content: note.content,
+                                            );
+                                          },
                                           child: Text('Share'),
                                         ),
                                       ]);
                                 },
-                                onPressedSlidable: (context) {
-                                  // context
-                                  //     .read<NotesBloc>()
-                                  //     .add(DeleteNotesEvent(index: index));
-                                },
-                                onDismissed: () {
-                                  // context
-                                  //     .read<NotesBloc>()
-                                  //     .add(DeleteNotesEvent(index: index));
-                                },
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => UpdateNotesScreen(
-                                      note: notes,
+                                      note: note,
                                       index: index,
                                     ),
                                   ));
                                 },
-                                icon: state.note[index].isBookmarked
+                                icon: note.isBookmarked
                                     ? Icons.bookmark_rounded
                                     : null,
-                                date: notes.date,
-                                title: notes.title,
-                                content: notes.content,
+                                date: note.date,
+                                title: note.title,
+                                content: note.content,
                               );
                             },
                           ),
