@@ -361,6 +361,10 @@ class _NotesScreenState extends State<NotesScreen> {
                                               date: note.modifiedAt,
                                               title: note.title,
                                               content: note.content,
+                                              searchQuery:
+                                                  _searchController.text.isEmpty
+                                                  ? null
+                                                  : _searchController.text,
                                             );
                                           },
                                         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scribble/src/core/utils/extensions.dart';
+import 'package:scribble/src/core/utils/text_highlight_util.dart';
 
 class NotesCard extends StatelessWidget {
   /// On tap function: When the user taps on the card
@@ -24,6 +25,9 @@ class NotesCard extends StatelessWidget {
   ///To fetch the details of the user tapped position
   final Function(TapDownDetails)? onTapDown;
 
+  /// Optional search query for highlighting matching text
+  final String? searchQuery;
+
   const NotesCard({
     super.key,
     this.icon,
@@ -33,6 +37,7 @@ class NotesCard extends StatelessWidget {
     this.content = '',
     required this.onTap,
     this.onTapDown,
+    this.searchQuery,
   });
 
   @override
@@ -60,13 +65,18 @@ class NotesCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 5),
-                Text(
-                  title.toString(),
+                // Title with search highlighting
+                RichText(
                   maxLines: 2,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Theme.of(context).textTheme.titleLarge?.color,
-                    fontWeight: FontWeight.w500,
+                  overflow: TextOverflow.ellipsis,
+                  text: buildHighlightedText(
+                    text: title.toString(),
+                    searchQuery: searchQuery,
+                    baseStyle: TextStyle(
+                      fontSize: 20,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -78,14 +88,18 @@ class NotesCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 5),
-                Text(
-                  content.toString(),
+                // Content with search highlighting
+                RichText(
                   maxLines: 10,
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.titleLarge?.color,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                    overflow: TextOverflow.fade,
+                  text: buildHighlightedText(
+                    text: content.toString(),
+                    searchQuery: searchQuery,
+                    baseStyle: TextStyle(
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      overflow: TextOverflow.fade,
+                    ),
                   ),
                 ),
               ],
