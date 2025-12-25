@@ -26,25 +26,28 @@ class TodoCard extends StatelessWidget {
       key: const ValueKey(0),
       direction: Axis.horizontal,
       endActionPane: ActionPane(
-          dismissible: DismissiblePane(onDismissed: onDismissed),
-          motion: const ScrollMotion(),
-          children: [
-            SlidableAction(
-              autoClose: true,
-              borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(15),
-                  bottomRight: Radius.circular(15)),
-              onPressed: onPressedSlidable,
-              backgroundColor: Color(0xFFFE4A49),
-              foregroundColor: Colors.white,
-              icon: Icons.delete_rounded,
+        dismissible: DismissiblePane(onDismissed: onDismissed),
+        motion: const ScrollMotion(),
+        children: [
+          SlidableAction(
+            autoClose: true,
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(15),
+              bottomRight: Radius.circular(15),
             ),
-          ]),
+            onPressed: onPressedSlidable,
+            backgroundColor: Color(0xFFFE4A49),
+            foregroundColor: Colors.white,
+            icon: Icons.delete_rounded,
+          ),
+        ],
+      ),
       child: Container(
         height: 90,
         decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: const BorderRadius.all(Radius.circular(15))),
+          color: Theme.of(context).colorScheme.surfaceContainer,
+          borderRadius: const BorderRadius.all(Radius.circular(15)),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Row(
@@ -60,28 +63,27 @@ class TodoCard extends StatelessWidget {
                       todo,
                       maxLines: 1,
                       style: TextStyle(
-                          decorationStyle: TextDecorationStyle.solid,
-                          decoration: value ? TextDecoration.lineThrough : null,
-                          color: value
-                              ? Colors.grey
-                              : Theme.of(context).textTheme.titleLarge?.color,
-                          fontSize: 18),
+                        decorationStyle: TextDecorationStyle.solid,
+                        decoration: value ? TextDecoration.lineThrough : null,
+                        color: value
+                            ? Colors.grey
+                            : Theme.of(context).textTheme.titleLarge?.color,
+                        fontSize: 18,
+                      ),
                     ),
                   ),
                   Text(
                     date,
                     style: TextStyle(
-                        color: value
-                            ? Colors.grey
-                            : Theme.of(context).textTheme.titleLarge?.color,
-                        fontSize: 14),
+                      color: value
+                          ? Colors.grey
+                          : Theme.of(context).textTheme.titleLarge?.color,
+                      fontSize: 14,
+                    ),
                   ),
                 ],
               ),
-              Checkbox(
-                value: value,
-                onChanged: onChanged,
-              )
+              Checkbox(value: value, onChanged: onChanged),
             ],
           ),
         ),

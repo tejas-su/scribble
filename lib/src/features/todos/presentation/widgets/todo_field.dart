@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class MessageField extends StatelessWidget {
+class TodoField extends StatelessWidget {
   ///Hint text to be sghown in the input field
   final String? prompt;
 
@@ -47,7 +47,7 @@ class MessageField extends StatelessWidget {
 
   ///Validator: Function(String?)? validator
   final String? Function(String?)? validator;
-  const MessageField({
+  const TodoField({
     this.validator,
     this.errorText,
     this.labelText,
@@ -90,7 +90,7 @@ class MessageField extends StatelessWidget {
           labelText: labelText,
           contentPadding: const EdgeInsets.all(20),
           filled: true,
-          fillColor: Theme.of(context).cardColor,
+          fillColor: Theme.of(context).colorScheme.surfaceContainer,
           hintText: prompt,
           hintStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
           border: const OutlineInputBorder(
