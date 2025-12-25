@@ -5,28 +5,56 @@ import '../../data/services/settings_database.dart';
 class SettingsCubit extends Cubit<Settings> {
   final HiveSettingsDatabase settingsDatabase;
 
-  SettingsCubit({
-    required this.settingsDatabase,
-  }) : super(settingsDatabase.getInitialSetting());
+  SettingsCubit({required this.settingsDatabase})
+    : super(settingsDatabase.getInitialSetting());
 
   void toggleTheme(bool isDarkMode) {
     //Retrive the grid state as we are updating only the theme and not the layout
-    Settings settings = settingsDatabase.getInitialSetting();
+    final Settings settings = settingsDatabase.getInitialSetting();
     //Update the values in the database
     settingsDatabase.putSettingsToBox(
-        isGrid: settings.isGrid, isDarkMode: isDarkMode);
-    emit(isDarkMode
-        ? Settings(isGrid: settings.isGrid, isDarkMode: true)
-        : Settings(isGrid: settings.isGrid, isDarkMode: false));
+      isGrid: settings.isGrid,
+      isDarkMode: isDarkMode,
+      sortByModifiedDate: settings.sortByModifiedDate,
+    );
+    emit(
+      Settings(
+        isGrid: settings.isGrid,
+        isDarkMode: isDarkMode,
+        sortByModifiedDate: settings.sortByModifiedDate,
+      ),
+    );
   }
 
   void toggleLayout(bool isGrid) {
-    Settings settings = settingsDatabase.getInitialSetting();
+    final Settings settings = settingsDatabase.getInitialSetting();
     settingsDatabase.putSettingsToBox(
-        isGrid: isGrid, isDarkMode: settings.isDarkMode);
+      isGrid: isGrid,
+      isDarkMode: settings.isDarkMode,
+      sortByModifiedDate: settings.sortByModifiedDate,
+    );
+    emit(
+      Settings(
+        isGrid: isGrid,
+        isDarkMode: settings.isDarkMode,
+        sortByModifiedDate: settings.sortByModifiedDate,
+      ),
+    );
+  }
 
-    emit(isGrid
-        ? Settings(isGrid: true, isDarkMode: settings.isDarkMode)
-        : Settings(isGrid: false, isDarkMode: settings.isDarkMode));
+  void toggleSortPreference(bool sortByModifiedDate) {
+    final Settings settings = settingsDatabase.getInitialSetting();
+    settingsDatabase.putSettingsToBox(
+      isGrid: settings.isGrid,
+      isDarkMode: settings.isDarkMode,
+      sortByModifiedDate: sortByModifiedDate,
+    );
+    emit(
+      Settings(
+        isGrid: settings.isGrid,
+        isDarkMode: settings.isDarkMode,
+        sortByModifiedDate: sortByModifiedDate,
+      ),
+    );
   }
 }

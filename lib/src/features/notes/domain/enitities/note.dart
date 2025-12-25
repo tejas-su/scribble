@@ -7,7 +7,9 @@ class Note extends Equatable {
 
   final String content;
 
-  final String date;
+  final String modifiedAt;
+
+  final String createdAt;
 
   final bool isBookMarked;
 
@@ -19,11 +21,19 @@ class Note extends Equatable {
     this.id,
     required this.title,
     required this.content,
-    required this.date,
+    required this.modifiedAt,
+    required this.createdAt,
     required this.isBookMarked,
     required this.isArchived,
     required this.isDeleted,
   });
   @override
-  List<Object?> get props => [title, content, date, isArchived, isBookMarked];
+  List<Object?> get props => [
+    title,
+    content,
+    modifiedAt,
+    createdAt,
+    isArchived,
+    isBookMarked,
+  ];
 }

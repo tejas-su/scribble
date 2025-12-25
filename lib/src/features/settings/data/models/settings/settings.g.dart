@@ -19,17 +19,20 @@ class SettingsAdapter extends TypeAdapter<Settings> {
     return Settings(
       isGrid: fields[0] as bool,
       isDarkMode: fields[1] as bool,
+      sortByModifiedDate: fields[2] as bool? ?? true,
     );
   }
 
   @override
   void write(BinaryWriter writer, Settings obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.isGrid)
       ..writeByte(1)
-      ..write(obj.isDarkMode);
+      ..write(obj.isDarkMode)
+      ..writeByte(2)
+      ..write(obj.sortByModifiedDate);
   }
 
   @override

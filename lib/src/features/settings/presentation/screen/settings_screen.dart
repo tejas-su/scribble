@@ -35,110 +35,107 @@ class SettingsScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'General',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'General',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+                  ),
+                  const SizedBox(height: 8),
+                  ListTile(
+                    tileColor: Theme.of(context).colorScheme.surfaceContainer,
+                    title: Text('Theme'),
+                    onTap: () {
+                      context.read<SettingsCubit>().toggleTheme(
+                        !state.isDarkMode,
+                      );
+                    },
+                    subtitle: state.isDarkMode
+                        ? Text('Light theme')
+                        : Text('Dark theme'),
+                    trailing: state.isDarkMode
+                        ? Icon(Icons.light_mode_rounded)
+                        : Icon(Icons.dark_mode_rounded),
+                  ),
+                  const SizedBox(height: 8),
+                  ListTile(
+                    onTap: () {
+                      context.read<SettingsCubit>().toggleLayout(!state.isGrid);
+                    },
+                    title: Text('Toggle Layout'),
+                    subtitle: state.isGrid
+                        ? Text('List view')
+                        : Text('Grid view'),
+                    trailing: state.isGrid
+                        ? Icon(Icons.table_rows_rounded)
+                        : Icon(Icons.grid_view_rounded),
+                    tileColor: Theme.of(context).colorScheme.surfaceContainer,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Danger zone',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.redAccent,
                     ),
-                    const SizedBox(height: 8),
-                    ListTile(
-                      title: Text('Theme'),
-                      onTap: () {
-                        context
-                            .read<SettingsCubit>()
-                            .toggleTheme(!state.isDarkMode);
-                      },
-                      subtitle: state.isDarkMode
-                          ? Text('Light theme')
-                          : Text('Dark theme'),
-                      trailing: state.isDarkMode
-                          ? Icon(Icons.light_mode_rounded)
-                          : Icon(Icons.dark_mode_rounded),
-                      tileColor: Theme.of(context).cardColor,
-                    ),
-                    const SizedBox(height: 8),
-                    ListTile(
-                      onTap: () {
-                        context
-                            .read<SettingsCubit>()
-                            .toggleLayout(!state.isGrid);
-                      },
-                      title: Text('Toggle Layout'),
-                      subtitle:
-                          state.isGrid ? Text('List view') : Text('Grid view'),
-                      trailing: state.isGrid
-                          ? Icon(Icons.table_rows_rounded)
-                          : Icon(Icons.grid_view_rounded),
-                      tileColor: Theme.of(context).cardColor,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Danger zone',
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.redAccent),
-                    ),
-                    const SizedBox(height: 8),
-                    ListTile(
-                      onTap: () {
-                        showAlertDialog(
-                          context: context,
-                          title: 'Delete all notes!',
-                          content: Text(
-                            'Are you sure you want to delete all the notes, this action cannot be undone',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          onPressed: () {
-                            context
-                                .read<NotesBloc>()
-                                .add(DeleteAllNotesevent());
-                            Navigator.of(context).pop();
-                          },
-                        );
-                      },
-                      title: Text('Delete'),
-                      subtitle: Text('Delete all notes'),
-                      trailing: Icon(Icons.delete_rounded),
-                      tileColor: Theme.of(context).cardColor,
-                    ),
-                    const SizedBox(height: 8),
-                    ListTile(
-                      onTap: () {
-                        showAlertDialog(
-                          context: context,
-                          title: 'Delete all tdos!',
-                          content: Text(
-                            'Are you sure you want to delete all the todos, this action cannot be undone',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          onPressed: () {
-                            context.read<TodosBloc>().add(DeleteAllTodoEvent());
-                            Navigator.of(context).pop();
-                          },
-                        );
-                      },
-                      title: Text('Delete'),
-                      subtitle: Text('Delete all todos'),
-                      trailing: Icon(Icons.delete_rounded),
-                      tileColor: Theme.of(context).cardColor,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'About',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
-                    ),
-                    SizedBox(height: 8),
-                    ListTile(
-                      tileColor: Theme.of(context).cardColor,
-                      title: Text('Version'),
-                      subtitle: Text('v3.0.0'),
-                      trailing: Icon(Icons.info_rounded),
-                    ),
-                  ]),
+                  ),
+                  const SizedBox(height: 8),
+                  ListTile(
+                    onTap: () {
+                      showAlertDialog(
+                        context: context,
+                        title: 'Delete all notes!',
+                        content: Text(
+                          'Are you sure you want to delete all the notes, this action cannot be undone',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        onPressed: () {
+                          context.read<NotesBloc>().add(DeleteAllNotesevent());
+                          Navigator.of(context).pop();
+                        },
+                      );
+                    },
+                    title: Text('Delete'),
+                    subtitle: Text('Delete all notes'),
+                    trailing: Icon(Icons.delete_rounded),
+                    tileColor: Theme.of(context).colorScheme.surfaceContainer,
+                  ),
+                  const SizedBox(height: 8),
+                  ListTile(
+                    onTap: () {
+                      showAlertDialog(
+                        context: context,
+                        title: 'Delete all tdos!',
+                        content: Text(
+                          'Are you sure you want to delete all the todos, this action cannot be undone',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        onPressed: () {
+                          context.read<TodosBloc>().add(DeleteAllTodoEvent());
+                          Navigator.of(context).pop();
+                        },
+                      );
+                    },
+                    title: Text('Delete'),
+                    subtitle: Text('Delete all todos'),
+                    trailing: Icon(Icons.delete_rounded),
+                    tileColor: Theme.of(context).colorScheme.surfaceContainer,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'About',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+                  ),
+                  SizedBox(height: 8),
+                  ListTile(
+                    tileColor: Theme.of(context).colorScheme.surfaceContainer,
+                    title: Text('Version'),
+                    subtitle: Text('v3.0.0'),
+                    trailing: Icon(Icons.info_rounded),
+                  ),
+                ],
+              ),
             ),
           );
         },

@@ -9,7 +9,14 @@ class Settings extends Equatable {
   @HiveField(1)
   final bool isDarkMode;
   @HiveField(2)
-  const Settings({required this.isGrid, required this.isDarkMode});
+  final bool sortByModifiedDate;
+
+  const Settings({
+    required this.isGrid,
+    required this.isDarkMode,
+    this.sortByModifiedDate = true,
+  });
+
   @override
-  List<Object?> get props => [isGrid, isDarkMode];
+  List<Object?> get props => [isGrid, isDarkMode, sortByModifiedDate];
 }

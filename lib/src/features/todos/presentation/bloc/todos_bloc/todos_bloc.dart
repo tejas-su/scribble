@@ -19,7 +19,7 @@ class TodosBloc extends Bloc<TodosEvent, TodosState> {
   void _onLoadTodos(LoadTodoEvent event, Emitter<TodosState> emit) {
     emit(TodosLoadingState());
     try {
-      List<Todos> todos = hiveDatabase.getTodos();
+      final List<Todos> todos = hiveDatabase.getTodos();
       emit(TodosLoadedState(todo: todos));
     } catch (e) {
       emit(TodoErrorState(errorMessage: e.toString()));
@@ -31,7 +31,7 @@ class TodosBloc extends Bloc<TodosEvent, TodosState> {
     emit(TodosLoadingState());
     try {
       await hiveDatabase.createTodo(event.todo);
-      List<Todos> todos = hiveDatabase.getTodos();
+      final List<Todos> todos = hiveDatabase.getTodos();
       emit(TodosLoadedState(todo: todos));
     } catch (e) {
       emit(TodoErrorState(errorMessage: e.toString()));
@@ -43,7 +43,7 @@ class TodosBloc extends Bloc<TodosEvent, TodosState> {
     emit(TodosLoadingState());
     try {
       await hiveDatabase.deleteTodo(event.index);
-      List<Todos> todos = hiveDatabase.getTodos();
+      final List<Todos> todos = hiveDatabase.getTodos();
       emit(TodosLoadedState(todo: todos));
     } catch (e) {
       emit(TodoErrorState(errorMessage: e.toString()));
@@ -54,7 +54,7 @@ class TodosBloc extends Bloc<TodosEvent, TodosState> {
   void _onUpdateTodo(UpdateTodoEvent event, Emitter<TodosState> emit) async {
     try {
       await hiveDatabase.updateTodo(event.index, event.todo);
-      List<Todos> todos = hiveDatabase.getTodos();
+      final List<Todos> todos = hiveDatabase.getTodos();
       emit(TodosLoadedState(todo: todos));
     } catch (e) {
       emit(TodoErrorState(errorMessage: e.toString()));
@@ -66,7 +66,7 @@ class TodosBloc extends Bloc<TodosEvent, TodosState> {
     emit(TodosLoadingState());
     try {
       hiveDatabase.deleteAllTodos();
-      List<Todos> todos = hiveDatabase.getTodos();
+      final List<Todos> todos = hiveDatabase.getTodos();
       emit(TodosLoadedState(todo: todos));
     } catch (e) {
       emit(TodoErrorState(

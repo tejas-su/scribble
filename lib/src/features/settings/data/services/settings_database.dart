@@ -6,22 +6,40 @@ class HiveSettingsDatabase {
   HiveSettingsDatabase({required this.box});
 
   static Future<Box<Settings>> openBox(String boxName) async {
-    Box<Settings> box = await Hive.openBox<Settings>(boxName);
+    final Box<Settings> box = await Hive.openBox<Settings>(boxName);
     return box;
   }
 
   void initializeSettings() {
     if (box.isEmpty) {
-      box.put(0, Settings(isGrid: false, isDarkMode: true));
+      box.put(
+        0,
+        const Settings(
+          isGrid: false,
+          isDarkMode: true,
+          sortByModifiedDate: true,
+        ),
+      );
     }
   }
 
   Settings getInitialSetting() {
-    List<Settings> settings = box.values.toList().cast<Settings>();
+    final List<Settings> settings = box.values.toList().cast<Settings>();
     return settings[0];
   }
 
-  void putSettingsToBox({required bool isGrid, required bool isDarkMode}) {
-    box.putAt(0, Settings(isGrid: isGrid, isDarkMode: isDarkMode));
+  void putSettingsToBox({
+    required bool isGrid,
+    required bool isDarkMode,
+    required bool sortByModifiedDate,
+  }) {
+    box.putAt(
+      0,
+      Settings(
+        isGrid: isGrid,
+        isDarkMode: isDarkMode,
+        sortByModifiedDate: sortByModifiedDate,
+      ),
+    );
   }
 }
