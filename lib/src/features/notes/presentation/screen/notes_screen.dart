@@ -91,18 +91,21 @@ class _NotesScreenState extends State<NotesScreen> {
       body: Column(
         mainAxisSize: .min,
         children: [
-          //Search and toggle layout bar
+          //Search bar
           Builder(
             builder: (context) {
               final NotesState state = context.watch<NotesBloc>().state;
 
-              // Hide search bar during loading, when deleted/archived, or when empty
+              // Hide search bar during loading, when deleted/archived/bookmarked,
+              // or when empty (but keep visible during active search)
+              final bool isSearching = _searchController.text.isNotEmpty;
+
               if (state is NotesLoadingState ||
                   (state is NotesLoadedState &&
                       (state.isDeleted ||
                           state.isArchived ||
                           state.isBookmarked ||
-                          state.notes.isEmpty))) {
+                          (state.notes.isEmpty && !isSearching)))) {
                 return SizedBox.shrink();
               } else {
                 return Padding(
