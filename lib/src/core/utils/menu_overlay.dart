@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 ///Show a menu overlay with options to delete, bookmark, share, and archive
 ///[restoreNote] is true if the note is archived or deleted,
 ///setting it to true will show restore and delete permanently options
+///[isDeletedNote] is true only for deleted notes (not archived),
+///determines whether delete action is permanent or soft delete
 ///[onDelete] is the callback function to be called when delete is pressed
 ///[onBookmark] is the callback function to be called when bookmark is pressed
 ///[onShare] is the callback function to be called when share is pressed
@@ -13,6 +15,7 @@ void showMenuOverlay({
   required BuildContext context,
   required RelativeRect rect,
   bool restoreNote = false,
+  bool isDeletedNote = false,
   VoidCallback? onDelete,
   VoidCallback? onBookmark,
   VoidCallback? onShare,
@@ -95,7 +98,7 @@ void showMenuOverlay({
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children:
-                    // If restoreNote is true, show restore and delete permanently options
+                    // If restoreNote is true, show restore and delete options
                     restoreNote
                     ? [
                         // Restore option
@@ -106,12 +109,20 @@ void showMenuOverlay({
                             onRestore!();
                           },
                         ),
-                        // Delete permanently option
+                        // Delete option - behavior depends on isDeletedNote
                         _MenuOption(
-                          label: 'Delete',
+                          label: isDeletedNote
+                              ? 'Delete Permanently'
+                              : 'Delete',
                           onTap: () {
                             removeOverlay();
-                            deletePermanently!();
+                            if (isDeletedNote) {
+                              // Hard delete for deleted notes
+                              deletePermanently!();
+                            } else {
+                              // Soft delete for archived notes
+                              onDelete!();
+                            }
                           },
                         ),
                       ]

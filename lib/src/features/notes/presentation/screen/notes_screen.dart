@@ -62,18 +62,31 @@ class _NotesScreenState extends State<NotesScreen> {
     }
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        elevation: 2,
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const NewNotesScreen()),
-          );
+      floatingActionButton: BlocBuilder<NotesBloc, NotesState>(
+        builder: (context, state) {
+          // Only show FAB on the main notes screen (not deleted, archived, or bookmarked)
+          if (state is NotesLoadedState &&
+              !state.isDeleted &&
+              !state.isArchived &&
+              !state.isBookmarked) {
+            return FloatingActionButton(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              elevation: 2,
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const NewNotesScreen(),
+                  ),
+                );
+              },
+              child: Icon(
+                Icons.edit_rounded,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
+            );
+          }
+          return const SizedBox.shrink();
         },
-        child: Icon(
-          Icons.edit_rounded,
-          color: Theme.of(context).colorScheme.onPrimaryContainer,
-        ),
       ),
       body: Column(
         mainAxisSize: .min,
@@ -294,6 +307,8 @@ class _NotesScreenState extends State<NotesScreen> {
                                                 showMenuOverlay(
                                                   restoreNote:
                                                       state.isArchived ||
+                                                      state.isDeleted,
+                                                  isDeletedNote:
                                                       state.isDeleted,
                                                   context: context,
                                                   rect: RelativeRect.fromLTRB(

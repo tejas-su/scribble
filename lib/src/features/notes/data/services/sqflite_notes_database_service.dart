@@ -112,7 +112,8 @@ class SqfliteNotesDatabaseService {
     if (onlyDeleted) {
       whereClause = 'isDeleted = 1';
     } else if (onlyArchived) {
-      whereClause = 'isArchived = 1';
+      // Show archived notes that are not deleted
+      whereClause = 'isArchived = 1 AND isDeleted = 0';
     } else {
       // Default: show only active notes (not deleted and not archived)
       whereClause = 'isArchived = 0 AND isDeleted = 0';

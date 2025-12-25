@@ -141,21 +141,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
   void _onUpdateNotes(UpdateNotesEvent event, Emitter<NotesState> emit) async {
     try {
       await updateNoteUseCase(event.id, event.note);
-      // Don't reset pagination on update, just refresh current view
-      final bool sortByModifiedDate = settingsCubit.state.sortByModifiedDate;
-      final List<Note> notes = await getNotesUseCase(
-        query: _currentQuery,
-        limit: _currentOffset > 0 ? _currentOffset : _pageSize,
-        offset: 0,
-        sortByModifiedDate: sortByModifiedDate,
-      );
-      emit(
-        NotesLoadedState(
-          notes: notes,
-          hasMore:
-              _currentOffset > notes.length || notes.length % _pageSize == 0,
-        ),
-      );
+      await _reloadCurrentView(emit);
     } catch (e) {
       emit(NotesErrorState(errorMessage: e.toString()));
     }
@@ -181,21 +167,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
   ) async {
     try {
       await bookmarkNoteUseCase(id: event.id, bookMark: event.bookMark);
-      // Don't reset pagination on bookmark, just refresh current view
-      final bool sortByModifiedDate = settingsCubit.state.sortByModifiedDate;
-      final List<Note> notes = await getNotesUseCase(
-        query: _currentQuery,
-        limit: _currentOffset > 0 ? _currentOffset : _pageSize,
-        offset: 0,
-        sortByModifiedDate: sortByModifiedDate,
-      );
-      emit(
-        NotesLoadedState(
-          notes: notes,
-          hasMore:
-              _currentOffset > notes.length || notes.length % _pageSize == 0,
-        ),
-      );
+      await _reloadCurrentView(emit);
     } catch (e) {
       emit(NotesErrorState(errorMessage: e.toString()));
     }
@@ -313,6 +285,69 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     EventMapper<SearchNotesEvent> mapper,
   ) {
     return events.debounce(const Duration(milliseconds: 500)).switchMap(mapper);
+  }
+
+  /// Reloads notes based on current view state (archived, bookmarked, or regular)
+  Future<void> _reloadCurrentView(
+    Emitter<NotesState> emit, {
+    bool? sortByModifiedDate,
+  }) async {
+    final currentState = state;
+    if (currentState is! NotesLoadedState) return;
+
+    final bool sort =
+        sortByModifiedDate ?? settingsCubit.state.sortByModifiedDate;
+    final int limit = _currentOffset > 0 ? _currentOffset : _pageSize;
+
+    try {
+      if (currentState.isArchived) {
+        final notes = await getNotesUseCase(
+          onlyArchived: true,
+          limit: limit,
+          offset: 0,
+          sortByModifiedDate: sort,
+        );
+        emit(
+          NotesLoadedState(
+            notes: notes,
+            hasMore:
+                _currentOffset > notes.length || notes.length % _pageSize == 0,
+            isArchived: true,
+          ),
+        );
+      } else if (currentState.isBookmarked) {
+        final notes = await getNotesUseCase(
+          onlyBookmarked: true,
+          limit: limit,
+          offset: 0,
+          sortByModifiedDate: sort,
+        );
+        emit(
+          NotesLoadedState(
+            notes: notes,
+            hasMore:
+                _currentOffset > notes.length || notes.length % _pageSize == 0,
+            isBookmarked: true,
+          ),
+        );
+      } else {
+        final notes = await getNotesUseCase(
+          query: _currentQuery,
+          limit: limit,
+          offset: 0,
+          sortByModifiedDate: sort,
+        );
+        emit(
+          NotesLoadedState(
+            notes: notes,
+            hasMore:
+                _currentOffset > notes.length || notes.length % _pageSize == 0,
+          ),
+        );
+      }
+    } catch (e) {
+      emit(NotesErrorState(errorMessage: e.toString()));
+    }
   }
 
   ///Delete the notes, soft delete or hard delete
