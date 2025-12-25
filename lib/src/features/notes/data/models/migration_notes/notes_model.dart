@@ -5,7 +5,8 @@ class NotesModel extends Note {
     super.id,
     required super.title,
     required super.content,
-    required super.date,
+    required super.modifiedAt,
+    required super.createdAt,
     required super.isBookMarked,
     required super.isArchived,
     required super.isDeleted,
@@ -15,7 +16,8 @@ class NotesModel extends Note {
     return {
       "id": super.id,
       "title": super.title,
-      "date": super.date,
+      "modifiedAt": super.modifiedAt,
+      "createdAt": super.createdAt,
       "content": super.content,
       "isBookMarked": super.isBookMarked ? 1 : 0,
       "isArchived": super.isArchived ? 1 : 0,
@@ -26,6 +28,7 @@ class NotesModel extends Note {
   NotesModel copyWith({
     String? title,
     String? date,
+    String? createdAt,
     String? content,
     bool? isBookMarked,
     bool? isArchived,
@@ -33,7 +36,8 @@ class NotesModel extends Note {
   }) {
     return NotesModel(
       title: title ?? this.title,
-      date: date ?? this.date,
+      modifiedAt: date ?? this.modifiedAt,
+      createdAt: createdAt ?? this.createdAt,
       content: content ?? this.content,
       isBookMarked: isBookMarked ?? this.isBookMarked,
       isArchived: isArchived ?? this.isArchived,
@@ -42,12 +46,24 @@ class NotesModel extends Note {
   }
 
   factory NotesModel.fromMap(Map<String, dynamic> map) => NotesModel(
-        id: map["id"],
-        title: map["title"],
-        content: map["content"],
-        date: map["date"],
-        isBookMarked: map["isBookMarked"] == 1,
-        isArchived: map["isArchived"] == 1,
-        isDeleted: map["isDeleted"] == 1,
-      );
+    id: map["id"],
+    title: map["title"],
+    content: map["content"],
+    modifiedAt: map["modifiedAt"],
+    createdAt: map["createdAt"],
+    isBookMarked: map["isBookMarked"] == 1,
+    isArchived: map["isArchived"] == 1,
+    isDeleted: map["isDeleted"] == 1,
+  );
+
+  factory NotesModel.fromEntity(Note note) => NotesModel(
+    id: note.id,
+    title: note.title,
+    content: note.content,
+    modifiedAt: note.modifiedAt,
+    createdAt: note.createdAt,
+    isBookMarked: note.isBookMarked,
+    isArchived: note.isArchived,
+    isDeleted: note.isDeleted,
+  );
 }

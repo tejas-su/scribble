@@ -1,6 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:scribble/src/features/notes/data/models/notes/notes.dart';
 
+@Deprecated('Use sqflite instead')
 class HiveNotesDatabase {
   final Box<Notes> box;
 

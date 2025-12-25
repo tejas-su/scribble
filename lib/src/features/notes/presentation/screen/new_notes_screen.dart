@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+import 'package:scribble/src/core/utils/extensions.dart';
+import 'package:scribble/src/features/notes/domain/enitities/note.dart';
 import '../bloc/bookmark_cubit.dart';
 import '../bloc/notes_bloc/notes_bloc.dart';
-import '../../data/models/notes/notes.dart';
 
 class NewNotesScreen extends StatefulWidget {
   const NewNotesScreen({super.key});
@@ -41,7 +41,7 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String date = DateFormat.yMMMEd().format(DateTime.now()).toString();
+   final String date = DateTime.now().toIso8601String();
     return BlocBuilder<BookmarkCubit, bool>(
       builder: (context, isBookMarked) {
         return PopScope(
@@ -50,13 +50,16 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
             ////the field is not empty then save the note
             if (titleController.text.isNotEmpty ||
                 contentController.text.isNotEmpty) {
-              final notes = Notes(
+              final note = Note(
+                isArchived: false,
+                isDeleted: false,
                 title: titleController.text,
-                date: date.toString(),
+                modifiedAt: date,
+                createdAt: date,
                 content: contentController.text,
-                isBookmarked: isBookMarked,
+                isBookMarked: isBookMarked,
               );
-              context.read<NotesBloc>().add(AddNotesEvent(notes: notes));
+              context.read<NotesBloc>().add(AddNotesEvent(note: note));
               //reset the bookmark state
               context.read<BookmarkCubit>().toggleBookmark(isBookMarked: true);
             }
@@ -70,14 +73,14 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
               backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
               actions: [
                 IconButton(
-                    onPressed: () =>
-                        context.read<BookmarkCubit>().toggleBookmark(
-                              isBookMarked: isBookMarked,
-                            ),
-                    icon: isBookMarked
-                        ? Icon(Icons.bookmark_rounded)
-                        : Icon(Icons.bookmark_outline_rounded)),
-                SizedBox(width: 4)
+                  onPressed: () => context.read<BookmarkCubit>().toggleBookmark(
+                    isBookMarked: isBookMarked,
+                  ),
+                  icon: isBookMarked
+                      ? Icon(Icons.bookmark_rounded)
+                      : Icon(Icons.bookmark_outline_rounded),
+                ),
+                SizedBox(width: 4),
               ],
             ),
             body: SingleChildScrollView(
@@ -89,25 +92,26 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
                     minLines: 1,
                     maxLines: 3,
                     maxLength: 55,
-                    buildCounter: (context,
-                            {required currentLength,
-                            required isFocused,
-                            required maxLength}) =>
-                        null,
+                    buildCounter:
+                        (
+                          context, {
+                          required currentLength,
+                          required isFocused,
+                          required maxLength,
+                        }) => null,
                     focusNode: titleFocusNode,
                     onEditingComplete: () => contentFocusNode.nextFocus(),
                     onTapOutside: (event) => contentFocusNode.nextFocus(),
                     controller: titleController,
                     style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: Theme.of(context).textTheme.titleLarge?.color,
-                        fontSize: 30),
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                      fontSize: 30,
+                    ),
                     decoration: const InputDecoration(
                       contentPadding: EdgeInsets.all(20),
                       hintText: 'Title',
-                      hintStyle: TextStyle(
-                        fontSize: 30,
-                      ),
+                      hintStyle: TextStyle(fontSize: 30),
                       border: InputBorder.none,
                     ),
                   ),
@@ -118,13 +122,13 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          date,
+                          date.yMMMEdFormat,
                           style: TextStyle(
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.color,
-                              fontSize: 15),
+                            color: Theme.of(
+                              context,
+                            ).textTheme.titleMedium?.color,
+                            fontSize: 15,
+                          ),
                         ),
                         Text('|'),
                         ValueListenableBuilder(
@@ -132,11 +136,11 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
                           builder: (context, value, child) => Text(
                             "${value.text.length} characters",
                             style: TextStyle(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.color,
-                                fontSize: 15),
+                              color: Theme.of(
+                                context,
+                              ).textTheme.titleMedium?.color,
+                              fontSize: 15,
+                            ),
                           ),
                         ),
                       ],
@@ -151,9 +155,10 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
                     maxLines: 1000,
                     controller: contentController,
                     style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        color: Theme.of(context).textTheme.titleLarge?.color,
-                        fontSize: 20),
+                      fontWeight: FontWeight.w400,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                      fontSize: 20,
+                    ),
                     decoration: const InputDecoration(
                       contentPadding: EdgeInsets.all(20),
                       hintMaxLines: 100,

@@ -32,7 +32,7 @@ class _TodoScreenState extends State<TodoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String date = DateFormat.yMMMEd().format(DateTime.now()).toString();
+    final String date = DateFormat.yMMMEd().format(DateTime.now()).toString();
     return Scaffold(
       body: Column(
         children: [
@@ -50,7 +50,7 @@ class _TodoScreenState extends State<TodoScreen> {
                           padding: const EdgeInsets.all(15),
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
-                            Todos todo = state.todo[index];
+                            final Todos todo = state.todo[index];
                             return Padding(
                                 padding: const EdgeInsets.only(bottom: 10),
                                 child: TodoCard(
@@ -107,7 +107,7 @@ class _TodoScreenState extends State<TodoScreen> {
                     ),
                   TodosEditingstate() => Builder(
                       builder: (context) {
-                        TextEditingController editingController =
+                        final TextEditingController editingController =
                             TextEditingController(text: state.todo.todo);
                         return Center(
                           child: MessageField(
@@ -146,7 +146,7 @@ class _TodoScreenState extends State<TodoScreen> {
                   minLines: 1,
                   onComplete: (p0) {
                     if (todoController.text.isNotEmpty) {
-                      Todos todo = Todos(
+                      final Todos todo = Todos(
                           isCompleted: false,
                           date: date,
                           todo: todoController.text);
@@ -158,7 +158,7 @@ class _TodoScreenState extends State<TodoScreen> {
                   controller: todoController,
                   onSubmitted: () {
                     if (todoController.text.isNotEmpty) {
-                      Todos todo = Todos(
+                      final Todos todo = Todos(
                           isCompleted: false,
                           date: date,
                           todo: todoController.text);

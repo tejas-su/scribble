@@ -86,24 +86,21 @@ class MessageField extends StatelessWidget {
         onFieldSubmitted: onComplete,
         style: const TextStyle(fontSize: 18),
         decoration: InputDecoration(
-            labelStyle: TextStyle(fontSize: 20),
-            labelText: labelText,
-            contentPadding: const EdgeInsets.all(20),
-            filled: true,
-            fillColor: Theme.of(context).cardColor,
-            hintText: prompt,
-            hintStyle:
-                const TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
-            border: const OutlineInputBorder(
-                borderSide: BorderSide.none,
-                gapPadding: 30,
-                borderRadius: BorderRadius.all(Radius.circular(15))),
-            suffixIcon: GestureDetector(
-              onTap: onSubmitted,
-              child: Icon(icon),
-            ),
-            errorText: errorText,
-            errorStyle: TextStyle(fontSize: 15)),
+          labelStyle: TextStyle(fontSize: 20),
+          labelText: labelText,
+          contentPadding: const EdgeInsets.all(20),
+          filled: true,
+          fillColor: Theme.of(context).cardColor,
+          hintText: prompt,
+          hintStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+          border: const OutlineInputBorder(
+            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.all(Radius.circular(15)),
+          ),
+          suffixIcon: GestureDetector(onTap: onSubmitted, child: Icon(icon)),
+          errorText: errorText,
+          errorStyle: TextStyle(fontSize: 15),
+        ),
       ),
     );
   }

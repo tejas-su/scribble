@@ -20,12 +20,11 @@ class SqfliteNotesDatabaseService {
   Future<Database> _initDB(String filePath) async {
     final String dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _createDB,
-    );
+    try {
+      return await openDatabase(path, version: 1, onCreate: _createDB);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future _createDB(Database db, int version) async {
@@ -34,104 +33,226 @@ class SqfliteNotesDatabaseService {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
         content TEXT NOT NULL,
-        date TEXT NOT NULL,
-        isBookmarked INTEGER NOT NULL DEFAULT 0,
+        modifiedAt TEXT NOT NULL,
+        createdAt TEXT NOT NULL,
+        isBookMarked INTEGER NOT NULL DEFAULT 0,
         isArchived INTEGER NOT NULL DEFAULT 0,
-        isDeleted INTEGER NOT NULL DEFAULT 0,
+        isDeleted INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
     // Indexes for optimized searching and sorting
-    await db.execute('CREATE INDEX idx_date ON notes(date)');
+    await db.execute('CREATE INDEX idx_date ON notes(modifiedAt)');
+    await db.execute('CREATE INDEX idx_createdAt ON notes(createdAt)');
     await db.execute('CREATE INDEX idx_bookmark ON notes(isBookmarked)');
     await db.execute('CREATE INDEX idx_archived ON notes(isArchived)');
     await db.execute('CREATE INDEX idx_title_content ON notes(title, content)');
   }
 
-  // Insert or Update Note
-  Future<int> upsertNote(NotesModel note) async {
+  /// Insert a new Note
+  Future<int> insertNote(NotesModel note) async {
     final db = await instance.database;
-    if (note.id == null) {
-      return await db.insert('notes', note.toMap());
-    } else {
-      return await db
-          .update('notes', note.toMap(), where: 'id = ?', whereArgs: [note.id]);
+    return await db.insert('notes', note.toMap());
+  }
+
+  /// Update Note
+  Future<int> updateNote(int id, NotesModel note) async {
+    final db = await instance.database;
+    try {
+      final noteMap = note.toMap()
+        ..remove('id'); // Remove id to avoid updating primary key
+      return await db.update(
+        'notes',
+        noteMap,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Failed to update note");
     }
   }
 
-  // Migration Insert all notes to the database
-  migrateNotes(List<NotesModel> notes) async {
-    final db = await instance.database;
-    // db.insert(table, values)
+  @Deprecated('Will be deprecating in future release')
+  /// Migration Insert all notes to the database
+  Future<void> migrateNotes(List<NotesModel> notes) async {
+    try {
+      final db = await instance.database;
+      final batch = db.batch();
+      for (final note in notes) {
+        batch.insert('notes', note.toMap());
+      }
+      await batch.commit();
+    } catch (e) {
+      throw Exception("Failed to migrate notes");
+    }
   }
 
-  // Get all active notes
+  /// Get all active notes
   Future<List<NotesModel>> getNotes({
     String? query,
-    bool sortByDateDesc = true,
     bool onlyBookmarked = false,
+    bool onlyDeleted = false,
+    bool onlyArchived = false,
+    int limit = 20,
+    int offset = 0,
+    bool sortByModifiedDate = true,
   }) async {
     final db = await instance.database;
-    String whereClause = 'isArchived = 0';
-    List<dynamic> whereArgs = [];
+    String whereClause;
+    final List<dynamic> whereArgs = [];
 
-    if (onlyBookmarked) {
-      whereClause += ' AND isBookmarked = 1';
+    String orderBy;
+    if (sortByModifiedDate) {
+      orderBy = 'datetime(modifiedAt) DESC';
+    } else {
+      orderBy = 'datetime(createdAt) DESC';
     }
 
+    // Determine base filter based on what type of notes to show
+    if (onlyDeleted) {
+      whereClause = 'isDeleted = 1';
+    } else if (onlyArchived) {
+      whereClause = 'isArchived = 1';
+    } else {
+      // Default: show only active notes (not deleted and not archived)
+      whereClause = 'isArchived = 0 AND isDeleted = 0';
+    }
+
+    // Add bookmark filter if needed
+    if (onlyBookmarked) {
+      whereClause += ' AND isBookMarked = 1';
+    }
+
+    // Add search query filter if provided
     if (query != null && query.isNotEmpty) {
       whereClause += ' AND (title LIKE ? OR content LIKE ?)';
       whereArgs.add('%$query%');
-      whereArgs.add('%$query%');
     }
 
-    final orderBy = sortByDateDesc ? 'date DESC' : 'date ASC';
-    final result = await db.query('notes',
-        where: whereClause, whereArgs: whereArgs, orderBy: orderBy);
-    return result.map((e) => NotesModel.fromMap(e)).toList();
+    try {
+      final result = await db.query(
+        'notes',
+        where: whereClause,
+        whereArgs: whereArgs,
+        orderBy: orderBy,
+        limit: limit,
+        offset: offset,
+      );
+      return result.map(NotesModel.fromMap).toList();
+    } catch (e) {
+      throw Exception("Failed to get notes");
+    }
   }
 
-  // Archive (delete) a note
+  /// Archive a note
   Future<int> archiveNote(int id) async {
     final db = await instance.database;
-    return await db.update('notes', {'isArchived': 1},
-        where: 'id = ?', whereArgs: [id]);
+    try {
+      return await db.update(
+        'notes',
+        {'isArchived': 1},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Failed to archive note");
+    }
   }
 
-  // Restore archived note
+  /// Bookmark a note
+  Future<int> bookmarkNote(int id) async {
+    final db = await instance.database;
+    try {
+      return await db.update(
+        'notes',
+        {'isBookmarked': 1},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Failed to bookmark note");
+    }
+  }
+
+  /// Unbookmark a note
+  Future<int> unbookmarkNote(int id) async {
+    final db = await instance.database;
+    try {
+      return await db.update(
+        'notes',
+        {'isBookmarked': 0},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Failed to unbookmark note");
+    }
+  }
+
+  /// Restore archived note
   Future<int> restoreArchivedNote(int id) async {
     final db = await instance.database;
-    return await db.update('notes', {'isArchived': 0},
-        where: 'id = ?', whereArgs: [id]);
+    try {
+      return await db.update(
+        'notes',
+        {'isArchived': 0},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Failed to restore archived note");
+    }
   }
 
-  // Restore deleted note
+  /// Restore deleted note
   Future<int> restoreDeletedNote(int id) async {
     final db = await instance.database;
-    return await db.update('notes', {'isDeleted': 0},
-        where: 'id = ?', whereArgs: [id]);
+    try {
+      return await db.update(
+        'notes',
+        {'isDeleted': 0},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Failed to restore deleted note");
+    }
   }
 
-  // Get archived notes
-  Future<List<NotesModel>> getArchivedNotes() async {
+  /// Soft delete (mark as deleted) a note
+  Future<int> softDeleteNote(int id) async {
     final db = await instance.database;
-    final result =
-        await db.query('notes', where: 'isArchived = 1', orderBy: 'date DESC');
-    return result.map((e) => NotesModel.fromMap(e)).toList();
+    try {
+      return await db.update(
+        'notes',
+        {'isDeleted': 1},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Failed to soft delete note");
+    }
   }
 
-  // Get deleted notes
-  Future<List<NotesModel>> getDeletedNotes() async {
-    final db = await instance.database;
-    final result =
-        await db.query('notes', where: 'isDeleted = 1', orderBy: 'date DESC');
-    return result.map((e) => NotesModel.fromMap(e)).toList();
-  }
-
-  // Delete permanently
+  /// Delete permanently
   Future<int> deleteNote(int id) async {
     final db = await instance.database;
-    return await db.delete('notes', where: 'id = ?', whereArgs: [id]);
+    try {
+      return await db.delete('notes', where: 'id = ?', whereArgs: [id]);
+    } catch (e) {
+      throw Exception("Failed to delete note");
+    }
+  }
+
+  /// Delete all notes
+  Future<void> deleteAllNotes() async {
+    final db = await instance.database;
+    try {
+      final batch = db.batch()..delete('notes');
+      await batch.commit();
+    } catch (e) {
+      throw Exception("Failed to delete all notes");
+    }
   }
 
   Future close() async {

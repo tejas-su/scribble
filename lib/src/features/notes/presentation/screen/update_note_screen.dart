@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+import 'package:scribble/src/core/utils/extensions.dart';
 import 'package:scribble/src/core/utils/share_plus_util.dart';
+import 'package:scribble/src/features/notes/domain/enitities/note.dart';
 import '../bloc/notes_bloc/notes_bloc.dart';
-import '../../data/models/notes/notes.dart';
 
 class UpdateNotesScreen extends StatefulWidget {
-  final Notes note;
-  final int index;
+  final Note note;
+  final int id;
 
-  const UpdateNotesScreen({
-    super.key,
-    required this.note,
-    required this.index,
-  });
+  const UpdateNotesScreen({super.key, required this.note, required this.id});
 
   @override
   State<UpdateNotesScreen> createState() => _UpdateNotesScreenState();
@@ -26,12 +21,15 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
 
   late FocusNode titleFocusNode;
   late FocusNode contentFocusNode;
+  late ValueNotifier<bool> isBookMarked;
 
   @override
   void initState() {
     super.initState();
     titleController = TextEditingController(text: widget.note.title);
     contentController = TextEditingController(text: widget.note.content);
+
+    isBookMarked = ValueNotifier(widget.note.isBookMarked);
 
     titleFocusNode = FocusNode();
     contentFocusNode = FocusNode();
@@ -42,6 +40,8 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
     titleController.dispose();
     contentController.dispose();
 
+    isBookMarked.dispose();
+
     titleFocusNode.dispose();
     contentFocusNode.dispose();
     super.dispose();
@@ -49,48 +49,57 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String date = DateFormat.yMMMEd().format(DateTime.now()).toString();
+    final String dateForDatabase = DateTime.now().toIso8601String();
 
-    //To listen to changes of bookmark state and build the ui as necessary
-    final notesLoadedState =
-        context.watch<NotesBloc>().state as NotesLoadedState;
     return BlocBuilder<NotesBloc, NotesState>(
       builder: (context, state) {
         return PopScope(
           onPopInvokedWithResult: (didPop, result) {
-            final notes = Notes(
-                title: titleController.text,
-                date: date.toString(),
-                content: contentController.text,
-                isBookmarked: notesLoadedState.note[widget.index].isBookmarked);
-            context
-                .read<NotesBloc>()
-                .add(UpdateNotesEvent(notes: notes, index: widget.index));
+            final note = Note(
+              isArchived: widget.note.isArchived,
+              isDeleted: widget.note.isDeleted,
+              title: titleController.text,
+              modifiedAt: dateForDatabase,
+              createdAt: widget.note.createdAt,
+              content: contentController.text,
+              isBookMarked: isBookMarked.value,
+            );
+            context.read<NotesBloc>().add(
+              UpdateNotesEvent(note: note, id: widget.id),
+            );
           },
           child: Scaffold(
             appBar: AppBar(
               forceMaterialTransparency: true,
               actions: [
-                IconButton(
-                  onPressed: () {
-                    context.read<NotesBloc>().add(UpdateNotesEvent(
-                        notes: widget.note.copyWith(
-                            isBookmarked: !notesLoadedState
-                                .note[widget.index].isBookmarked),
-                        index: widget.index));
-                  },
-                  icon: notesLoadedState.note[widget.index].isBookmarked
-                      ? Icon(Icons.bookmark_rounded)
-                      : Icon(Icons.bookmark_outline_rounded),
-                ),
-                IconButton(
-                    onPressed: () async {
-                      await shareNote(
-                        title: widget.note.title,
-                        content: widget.note.content,
+                ValueListenableBuilder(
+                  valueListenable: isBookMarked,
+                  builder: (context, value, child) => IconButton(
+                    onPressed: () {
+                      //Update the local state
+                      isBookMarked.value = !isBookMarked.value;
+                      //Update the database
+                      context.read<NotesBloc>().add(
+                        BookmarkNotesEvent(
+                          id: widget.id,
+                          bookMark: !isBookMarked.value,
+                        ),
                       );
                     },
-                    icon: Icon(Icons.share_rounded))
+                    icon: value
+                        ? Icon(Icons.bookmark_rounded)
+                        : Icon(Icons.bookmark_outline_rounded),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () async {
+                    await shareNote(
+                      title: widget.note.title,
+                      content: widget.note.content,
+                    );
+                  },
+                  icon: Icon(Icons.share_rounded),
+                ),
               ],
             ),
             body: SingleChildScrollView(
@@ -105,22 +114,26 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
                     minLines: 1,
                     maxLines: 3,
                     maxLength: 55,
-                    buildCounter: (context,
-                            {required currentLength,
-                            required isFocused,
-                            required maxLength}) =>
-                        null,
+                    buildCounter:
+                        (
+                          context, {
+                          required currentLength,
+                          required isFocused,
+                          required maxLength,
+                        }) => null,
                     controller: titleController,
                     style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: Theme.of(context).textTheme.titleLarge?.color,
-                        fontSize: 30),
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                      fontSize: 30,
+                    ),
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.all(20),
                       hintText: 'Title 👀',
                       hintStyle: TextStyle(
-                          color: Theme.of(context).textTheme.titleMedium?.color,
-                          fontSize: 30),
+                        color: Theme.of(context).textTheme.titleMedium?.color,
+                        fontSize: 30,
+                      ),
                       border: InputBorder.none,
                     ),
                   ),
@@ -131,13 +144,13 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          widget.note.date,
+                          widget.note.modifiedAt.yMMMEdFormat,
                           style: TextStyle(
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.color,
-                              fontSize: 15),
+                            color: Theme.of(
+                              context,
+                            ).textTheme.titleMedium?.color,
+                            fontSize: 15,
+                          ),
                         ),
                         Text('|'),
                         ValueListenableBuilder(
@@ -145,11 +158,11 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
                           builder: (context, value, child) => Text(
                             "${value.text.length} characters",
                             style: TextStyle(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.color,
-                                fontSize: 15),
+                              color: Theme.of(
+                                context,
+                              ).textTheme.titleMedium?.color,
+                              fontSize: 15,
+                            ),
                           ),
                         ),
                       ],
@@ -164,16 +177,18 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
                     maxLines: 1000,
                     controller: contentController,
                     style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        color: Theme.of(context).textTheme.titleLarge?.color,
-                        fontSize: 20),
+                      fontWeight: FontWeight.w400,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                      fontSize: 20,
+                    ),
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.all(20),
                       hintMaxLines: 100,
                       hintText: 'Type something...',
                       hintStyle: TextStyle(
-                          color: Theme.of(context).textTheme.titleMedium?.color,
-                          fontSize: 18),
+                        color: Theme.of(context).textTheme.titleMedium?.color,
+                        fontSize: 18,
+                      ),
                       border: InputBorder.none,
                     ),
                   ),
