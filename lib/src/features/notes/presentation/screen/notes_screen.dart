@@ -124,56 +124,18 @@ class _NotesScreenState extends State<NotesScreen> {
                           onTapOutside: (_) => _focusNode.unfocus(),
                           focusNode: _focusNode,
                           trailing: [
-                            //Toggle layout button
-                            ValueListenableBuilder(
-                              valueListenable: _searchController,
-                              builder: (context, value, child) {
-                                if (value.text.isEmpty) {
-                                  return Builder(
-                                    builder: (context) {
-                                      final bool isGrid = context
-                                          .watch<SettingsCubit>()
-                                          .state
-                                          .isGrid;
-                                      return GestureDetector(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            right: 8.0,
-                                          ),
-                                          child: Icon(
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onSurface,
-                                            isGrid
-                                                ? Icons.table_rows_rounded
-                                                : Icons.grid_view_rounded,
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          context
-                                              .read<SettingsCubit>()
-                                              .toggleLayout(!isGrid);
-                                        },
-                                      );
-                                    },
-                                  );
-                                } else {
-                                  return GestureDetector(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                        right: 8.0,
-                                      ),
-                                      child: const Icon(Icons.clear),
-                                    ),
-                                    onTap: () {
-                                      _searchController.clear();
-                                      _focusNode.unfocus();
-                                      context.read<NotesBloc>().add(
-                                        const SearchNotesEvent(query: ''),
-                                      );
-                                    },
-                                  );
-                                }
+                            //Cancel button to clear search
+                            GestureDetector(
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: const Icon(Icons.clear),
+                              ),
+                              onTap: () {
+                                _searchController.clear();
+                                _focusNode.unfocus();
+                                context.read<NotesBloc>().add(
+                                  const SearchNotesEvent(query: ''),
+                                );
                               },
                             ),
                           ],
