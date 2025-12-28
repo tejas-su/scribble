@@ -16,7 +16,7 @@ https://play.google.com/store/apps/details?id=com.widgetsandco.scribble
 
 ## Tech Stacks
 
-1. Hive Database for local storage and persistence of data
+1. Sqlite Database for local storage and persistence of data
 2. Flutter BLoc for state management 
 
 ## How to use it
