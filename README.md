@@ -5,6 +5,13 @@ Simple minimalist note taking app buit using flutter.
 ## Get it on Playstore
 https://play.google.com/store/apps/details?id=com.widgetsandco.scribble
 
+<p align="center">
+  <img src="static/10_1x_shots_so.png" width="30%" />
+  <img src="static/734_1x_shots_so.png" width="30%" />
+  <img src="static/124_1x_shots_so.png" width="30%" />
+</p>
+
+
 ## Features
 
 1. Creation of notes
