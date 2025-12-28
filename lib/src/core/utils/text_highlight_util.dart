@@ -35,7 +35,9 @@ TextSpan buildHighlightedText({
       TextSpan(
         text: text.substring(index, index + lowerQuery.length),
         style: baseStyle.copyWith(
-          backgroundColor: highlightColor,
+          background: Paint()
+            ..color = highlightColor
+            ..style = PaintingStyle.fill,
           color: Colors.black, // Ensure text is readable on yellow background
         ),
       ),

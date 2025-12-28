@@ -128,6 +128,7 @@ class SqfliteNotesDatabaseService {
     if (query != null && query.isNotEmpty) {
       whereClause += ' AND (title LIKE ? OR content LIKE ?)';
       whereArgs.add('%$query%');
+      whereArgs.add('%$query%');
     }
 
     try {
