@@ -106,6 +106,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
       emit(
         NotesLoadedState(
           notes: notes,
+          searchQuery: _currentQuery,
           hasMore: notes.length == _pageSize,
           isDeleted: false,
           isArchived: false,
@@ -131,7 +132,13 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
         sortByModifiedDate: sortByModifiedDate,
       );
       _currentOffset = notes.length;
-      emit(NotesLoadedState(notes: notes, hasMore: notes.length == _pageSize));
+      emit(
+        NotesLoadedState(
+          notes: notes,
+          searchQuery: _currentQuery,
+          hasMore: notes.length == _pageSize,
+        ),
+      );
     } catch (e) {
       emit(NotesErrorState(errorMessage: e.toString()));
     }
@@ -154,7 +161,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
   ) async {
     try {
       await deleteAllNotesUseCase();
-      emit(const NotesLoadedState(notes: []));
+      emit(const NotesLoadedState(notes: [], searchQuery: null));
     } catch (e) {
       emit(NotesErrorState(errorMessage: e.toString()));
     }
@@ -189,8 +196,15 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
         offset: 0,
         sortByModifiedDate: sortByModifiedDate,
       );
+
       _currentOffset = notes.length;
-      emit(NotesLoadedState(notes: notes, hasMore: notes.length == _pageSize));
+      emit(
+        NotesLoadedState(
+          notes: notes,
+          searchQuery: _currentQuery,
+          hasMore: notes.length == _pageSize,
+        ),
+      );
     } catch (e) {
       emit(NotesErrorState(errorMessage: e.toString()));
     }
@@ -222,6 +236,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
       emit(
         NotesLoadedState(
           notes: [...currentState.notes, ...moreNotes],
+          searchQuery: _currentQuery,
           hasMore: moreNotes.length == _pageSize,
           isLoadingMore: false,
         ),
@@ -247,6 +262,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
         NotesLoadedState(
           isDeleted: true,
           notes: moreNotes,
+          searchQuery: _currentQuery,
           hasMore: moreNotes.length == _pageSize,
         ),
       );
@@ -271,6 +287,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
         NotesLoadedState(
           isArchived: true,
           notes: moreNotes,
+          searchQuery: _currentQuery,
           hasMore: moreNotes.length == _pageSize,
         ),
       );
@@ -310,6 +327,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
         emit(
           NotesLoadedState(
             notes: notes,
+            searchQuery: _currentQuery,
             hasMore:
                 _currentOffset > notes.length || notes.length % _pageSize == 0,
             isArchived: true,
@@ -325,6 +343,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
         emit(
           NotesLoadedState(
             notes: notes,
+            searchQuery: _currentQuery,
             hasMore:
                 _currentOffset > notes.length || notes.length % _pageSize == 0,
             isBookmarked: true,
@@ -340,6 +359,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
         emit(
           NotesLoadedState(
             notes: notes,
+            searchQuery: _currentQuery,
             hasMore:
                 _currentOffset > notes.length || notes.length % _pageSize == 0,
           ),
@@ -378,6 +398,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
           emit(
             NotesLoadedState(
               notes: notes,
+              searchQuery: _currentQuery,
               hasMore: notes.length == _pageSize,
               isDeleted: true,
             ),
@@ -392,6 +413,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
           emit(
             NotesLoadedState(
               notes: notes,
+              searchQuery: _currentQuery,
               hasMore: notes.length == _pageSize,
               isArchived: true,
             ),
@@ -403,7 +425,11 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
             sortByModifiedDate: sortByModifiedDate,
           );
           emit(
-            NotesLoadedState(notes: notes, hasMore: notes.length == _pageSize),
+            NotesLoadedState(
+              notes: notes,
+              searchQuery: _currentQuery,
+              hasMore: notes.length == _pageSize,
+            ),
           );
         }
       }
@@ -431,6 +457,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
           emit(
             NotesLoadedState(
               notes: notes,
+              searchQuery: _currentQuery,
               hasMore: notes.length == _pageSize,
               isDeleted: true,
             ),
@@ -444,6 +471,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
           emit(
             NotesLoadedState(
               notes: notes,
+              searchQuery: _currentQuery,
               hasMore: notes.length == _pageSize,
               isArchived: true,
             ),
@@ -454,7 +482,11 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
             offset: 0,
           );
           emit(
-            NotesLoadedState(notes: notes, hasMore: notes.length == _pageSize),
+            NotesLoadedState(
+              notes: notes,
+              searchQuery: _currentQuery,
+              hasMore: notes.length == _pageSize,
+            ),
           );
         }
       }
@@ -482,6 +514,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
           emit(
             NotesLoadedState(
               notes: notes,
+              searchQuery: _currentQuery,
               hasMore: notes.length == _pageSize,
               isDeleted: true,
             ),
@@ -495,6 +528,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
           emit(
             NotesLoadedState(
               notes: notes,
+              searchQuery: _currentQuery,
               hasMore: notes.length == _pageSize,
               isArchived: true,
             ),
@@ -505,7 +539,11 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
             offset: 0,
           );
           emit(
-            NotesLoadedState(notes: notes, hasMore: notes.length == _pageSize),
+            NotesLoadedState(
+              notes: notes,
+              searchQuery: _currentQuery,
+              hasMore: notes.length == _pageSize,
+            ),
           );
         }
       }
@@ -527,6 +565,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
       emit(
         NotesLoadedState(
           notes: notes,
+          searchQuery: _currentQuery,
           hasMore: notes.length == _pageSize,
           isBookmarked: true,
           isDeleted: false,

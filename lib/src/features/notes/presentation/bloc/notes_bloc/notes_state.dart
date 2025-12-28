@@ -11,6 +11,7 @@ final class NotesLoadingState extends NotesState {}
 
 final class NotesLoadedState extends NotesState {
   final List<Note> notes;
+  final String? searchQuery;
   final bool isSelecting;
   final bool hasMore;
   final bool isLoadingMore;
@@ -20,6 +21,7 @@ final class NotesLoadedState extends NotesState {
 
   const NotesLoadedState({
     required this.notes,
+    this.searchQuery,
     this.isSelecting = false,
     this.hasMore = true,
     this.isLoadingMore = false,
@@ -31,6 +33,7 @@ final class NotesLoadedState extends NotesState {
   @override
   List<Object> get props => [
     notes,
+    searchQuery ?? '',
     isSelecting,
     hasMore,
     isLoadingMore,
@@ -41,6 +44,7 @@ final class NotesLoadedState extends NotesState {
 
   NotesLoadedState copyWith({
     List<Note>? note,
+    String? searchQuery,
     bool? isSelecting,
     bool? hasMore,
     bool? isLoadingMore,
@@ -50,6 +54,7 @@ final class NotesLoadedState extends NotesState {
   }) {
     return NotesLoadedState(
       notes: note ?? this.notes,
+      searchQuery: searchQuery ?? this.searchQuery,
       isSelecting: isSelecting ?? this.isSelecting,
       hasMore: hasMore ?? this.hasMore,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,

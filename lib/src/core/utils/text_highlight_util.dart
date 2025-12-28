@@ -16,41 +16,42 @@ TextSpan buildHighlightedText({
   if (searchQuery == null || searchQuery.isEmpty) {
     return TextSpan(text: text, style: baseStyle);
   }
-
+  // Use RegExp for case-insensitive matching and exact match ranges
   final List<TextSpan> spans = [];
-  final String lowerText = text.toLowerCase();
-  final String lowerQuery = searchQuery.toLowerCase();
+  final regExp = RegExp(RegExp.escape(searchQuery), caseSensitive: false);
+  int lastMatchEnd = 0;
 
-  int start = 0;
-  int index = lowerText.indexOf(lowerQuery);
-
-  while (index != -1) {
-    // Add text before match
-    if (index > start) {
-      spans.add(TextSpan(text: text.substring(start, index), style: baseStyle));
+  for (final match in regExp.allMatches(text)) {
+    if (match.start > lastMatchEnd) {
+      spans.add(
+        TextSpan(
+          text: text.substring(lastMatchEnd, match.start),
+          style: baseStyle,
+        ),
+      );
     }
 
-    // Add highlighted match
+    final matchedText =
+        match.group(0) ?? text.substring(match.start, match.end);
     spans.add(
       TextSpan(
-        text: text.substring(index, index + lowerQuery.length),
+        text: matchedText,
         style: baseStyle.copyWith(
-          background: Paint()
-            ..color = highlightColor
-            ..style = PaintingStyle.fill,
-          color: Colors.black, // Ensure text is readable on yellow background
+          backgroundColor: highlightColor,
+          color: Colors.black,
         ),
       ),
     );
 
-    start = index + lowerQuery.length;
-    index = lowerText.indexOf(lowerQuery, start);
+    lastMatchEnd = match.end;
   }
 
-  // Add remaining text
-  if (start < text.length) {
-    spans.add(TextSpan(text: text.substring(start), style: baseStyle));
+  if (lastMatchEnd < text.length) {
+    spans.add(TextSpan(text: text.substring(lastMatchEnd), style: baseStyle));
   }
+
+  // If no matches found, return plain text to avoid empty children
+  if (spans.isEmpty) return TextSpan(text: text, style: baseStyle);
 
   return TextSpan(children: spans);
 }

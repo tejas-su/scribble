@@ -124,9 +124,11 @@ class _NotesScreenState extends State<NotesScreen> {
                       Expanded(
                         child: SearchBar(
                           controller: _searchController,
-                          onChanged: (value) => context.read<NotesBloc>().add(
-                            SearchNotesEvent(query: value),
-                          ),
+                          onChanged: (value) {
+                            context.read<NotesBloc>().add(
+                              SearchNotesEvent(query: value),
+                            );
+                          },
                           onSubmitted: (value) => _focusNode.unfocus(),
                           onTapOutside: (_) => _focusNode.unfocus(),
                           focusNode: _focusNode,
@@ -368,10 +370,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                               date: note.modifiedAt,
                                               title: note.title,
                                               content: note.content,
-                                              searchQuery:
-                                                  _searchController.text.isEmpty
-                                                  ? null
-                                                  : _searchController.text,
+                                              searchQuery: state.searchQuery,
                                             );
                                           },
                                         ),
