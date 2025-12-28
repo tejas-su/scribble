@@ -73,6 +73,13 @@ class _NotesScreenState extends State<NotesScreen> {
               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               elevation: 2,
               onPressed: () {
+                //Clear the search results and set it to initial results
+                _searchController.clear();
+                _focusNode.unfocus();
+                context.read<NotesBloc>().add(
+                  const SearchNotesEvent(query: ''),
+                );
+                //Navigate to new notes screen
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => const NewNotesScreen(),
