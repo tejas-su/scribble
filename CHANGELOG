@@ -1,3 +1,13 @@
+Scribble v4.0
+
+What's new,
+- Database migrated to SQLite for improved reliability and performance.
+- Full-text search enabled across note title and content.
+- Search matches are highlighted within notes.
+- Notes can be sorted by date created and date modified.
+- Notes can be deleted, archived, and bookmarked.
+- Deleted, archived, and bookmarked notes are accessible from the navigation drawer.
+
 Scribble v3.0
 
 What’s New,
