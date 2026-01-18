@@ -64,6 +64,7 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
             createdAt: date,
             content: contentController.text,
             isBookMarked: bookMarkNotifier.value,
+            isReadOnly: readOnlyNotifier.value,
           );
           context.read<NotesBloc>().add(AddNotesEvent(note: note));
         }

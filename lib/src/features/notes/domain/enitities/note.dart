@@ -17,6 +17,8 @@ class Note extends Equatable {
 
   final bool isDeleted;
 
+  final bool isReadOnly;
+
   const Note({
     this.id,
     required this.title,
@@ -26,6 +28,7 @@ class Note extends Equatable {
     required this.isBookMarked,
     required this.isArchived,
     required this.isDeleted,
+    required this.isReadOnly,
   });
   @override
   List<Object?> get props => [
@@ -35,5 +38,6 @@ class Note extends Equatable {
     createdAt,
     isArchived,
     isBookMarked,
+    isReadOnly,
   ];
 }

@@ -6,6 +6,7 @@ import 'package:scribble/src/features/notes/data/services/sqflite_notes_database
 import 'package:scribble/src/features/notes/domain/usecase/add_note_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/archive_notes_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/bookmark_note_usecase.dart';
+import 'package:scribble/src/features/notes/domain/usecase/read_write_access_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/soft_delete_note_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/delete_note_permanently_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/delete_all_notes_usecase.dart';
@@ -84,6 +85,7 @@ class MyApp extends StatelessWidget {
               deleteNotePermanentlyUseCase: DeleteNotePermanentlyUseCase(repo),
               deleteAllNotesUseCase: DeleteAllNotesUseCase(repo),
               bookmarkNoteUseCase: BookmarkNoteUseCase(repo),
+              readWriteAccessUsecase: ReadWriteAccessUsecase(repo),
               hiveDatabase: HiveNotesDatabase(box: notesBox),
               settingsCubit: settingsCubit,
             )..add(LoadNotesEvent(sortByModifiedDate: sortByModifiedDate));

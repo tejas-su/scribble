@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:scribble/src/features/notes/domain/usecase/delete_all_notes_usecase.dart';
+import 'package:scribble/src/features/notes/domain/usecase/read_write_access_usecase.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -30,6 +31,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
   final ArchiveNotesUseCase archiveNotesUseCase;
   final RestoreNotesUseCase restoreNotesUseCase;
   final DeleteAllNotesUseCase deleteAllNotesUseCase;
+  final ReadWriteAccessUsecase readWriteAccessUsecase;
   final HiveNotesDatabase hiveDatabase;
   final SettingsCubit settingsCubit;
 
@@ -48,6 +50,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     required this.archiveNotesUseCase,
     required this.restoreNotesUseCase,
     required this.deleteAllNotesUseCase,
+    required this.readWriteAccessUsecase,
     required this.hiveDatabase,
     required this.settingsCubit,
   }) : super(NotesLoadingState()) {
@@ -64,6 +67,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     on<RestoreNotesEvent>(_onRestoreNotes);
     on<ArchiveNotesEvent>(_onArchiveNotes);
     on<LoadBookmarkedNotesEvent>(_onLoadBookmarkedNotes);
+    on<GiveReadWriteAccessEvent>(_giveReadWriteAccess);
   }
   //load the notes
   Future<void> _onLoadNotes(
@@ -89,6 +93,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
                 isBookMarked: note.isBookmarked,
                 isArchived: false,
                 isDeleted: false,
+                isReadOnly: false,
               ),
             )
             .toList(),
@@ -572,6 +577,18 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
           isArchived: false,
         ),
       );
+    } catch (e) {
+      emit(NotesErrorState(errorMessage: e.toString()));
+    }
+  }
+
+  FutureOr<void> _giveReadWriteAccess(
+    GiveReadWriteAccessEvent event,
+    Emitter<NotesState> emit,
+  ) async {
+    try {
+      await readWriteAccessUsecase(id: event.id, isReadOnly: event.isReadOnly);
+      await _reloadCurrentView(emit);
     } catch (e) {
       emit(NotesErrorState(errorMessage: e.toString()));
     }

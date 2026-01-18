@@ -110,6 +110,24 @@ class NotesRepositoryImpl implements NotesRepository {
   }
 
   @override
+  Future<void> giveWriteAccess(int id) async {
+    try {
+      await _sqfliteNotesDatabaseService.giveWriteAccess(id);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> makeNoteReadOnly(int id) async {
+    try {
+      await _sqfliteNotesDatabaseService.makeNoteReadOnly(id);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
   Future<void> restoreNote(int id, {bool isDeletedNote = false}) {
     try {
       if (isDeletedNote) {
