@@ -29,6 +29,16 @@ final class ArchiveNotesEvent extends NotesEvent {
   List<Object> get props => [id];
 }
 
+final class GiveReadWriteAccessEvent extends NotesEvent {
+  final int id;
+  final bool isReadOnly;
+
+  const GiveReadWriteAccessEvent({required this.id, required this.isReadOnly});
+
+  @override
+  List<Object> get props => [id];
+}
+
 final class RestoreNotesEvent extends NotesEvent {
   final int id;
   final bool isDeletedNote;

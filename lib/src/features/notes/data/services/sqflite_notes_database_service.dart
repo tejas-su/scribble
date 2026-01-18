@@ -21,7 +21,12 @@ class SqfliteNotesDatabaseService {
     final String dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
     try {
-      return await openDatabase(path, version: 1, onCreate: _createDB);
+      return await openDatabase(
+        path,
+        version: 2,
+        onCreate: _createDB,
+        onUpgrade: _onUpgrade,
+      );
     } catch (e) {
       rethrow;
     }
@@ -37,7 +42,8 @@ class SqfliteNotesDatabaseService {
         createdAt TEXT NOT NULL,
         isBookMarked INTEGER NOT NULL DEFAULT 0,
         isArchived INTEGER NOT NULL DEFAULT 0,
-        isDeleted INTEGER NOT NULL DEFAULT 0
+        isDeleted INTEGER NOT NULL DEFAULT 0,
+        isReadOnly INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
@@ -47,6 +53,18 @@ class SqfliteNotesDatabaseService {
     await db.execute('CREATE INDEX idx_bookmark ON notes(isBookmarked)');
     await db.execute('CREATE INDEX idx_archived ON notes(isArchived)');
     await db.execute('CREATE INDEX idx_title_content ON notes(title, content)');
+  }
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    try {
+      if (oldVersion < newVersion) {
+        await db.execute(
+          'ALTER TABLE notes ADD COLUMN isReadOnly INTEGER NOT NULL DEFAULT 0',
+        );
+      }
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// Insert a new Note
@@ -127,8 +145,9 @@ class SqfliteNotesDatabaseService {
     // Add search query filter if provided
     if (query != null && query.isNotEmpty) {
       whereClause += ' AND (title LIKE ? OR content LIKE ?)';
-      whereArgs.add('%$query%');
-      whereArgs.add('%$query%');
+      whereArgs
+        ..add('%$query%')
+        ..add('%$query%');
     }
 
     try {
@@ -173,6 +192,36 @@ class SqfliteNotesDatabaseService {
       );
     } catch (e) {
       throw Exception("Failed to bookmark note");
+    }
+  }
+
+  /// Make a note readonly
+  Future<int> makeNoteReadOnly(int id) async {
+    final db = await instance.database;
+    try {
+      return await db.update(
+        'notes',
+        {'isReadOnly': 1},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Failed to make the note readonly");
+    }
+  }
+
+  /// Give write permission to a particular note
+  Future<int> giveWriteAccess(int id) async {
+    final db = await instance.database;
+    try {
+      return await db.update(
+        'notes',
+        {'isReadOnly': 0},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Failed to give write access");
     }
   }
 

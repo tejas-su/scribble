@@ -22,6 +22,7 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
   late FocusNode titleFocusNode;
   late FocusNode contentFocusNode;
   late ValueNotifier<bool> isBookMarked;
+  late ValueNotifier<bool> readOnlyNotifier;
 
   @override
   void initState() {
@@ -30,6 +31,7 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
     contentController = TextEditingController(text: widget.note.content);
 
     isBookMarked = ValueNotifier(widget.note.isBookMarked);
+    readOnlyNotifier = ValueNotifier(widget.note.isReadOnly);
 
     titleFocusNode = FocusNode();
     contentFocusNode = FocusNode();
@@ -41,6 +43,7 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
     contentController.dispose();
 
     isBookMarked.dispose();
+    readOnlyNotifier.dispose();
 
     titleFocusNode.dispose();
     contentFocusNode.dispose();
@@ -63,6 +66,7 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
               createdAt: widget.note.createdAt,
               content: contentController.text,
               isBookMarked: isBookMarked.value,
+              isReadOnly: readOnlyNotifier.value,
             );
             context.read<NotesBloc>().add(
               UpdateNotesEvent(note: note, id: widget.id),
@@ -73,17 +77,33 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
               forceMaterialTransparency: true,
               actions: [
                 ValueListenableBuilder(
+                  valueListenable: readOnlyNotifier,
+                  builder: (context, readOnly, child) => IconButton(
+                    onPressed: () {
+                      //Update the local state
+                      readOnlyNotifier.value = !readOnly;
+                      //Update the database
+                      context.read<NotesBloc>().add(
+                        GiveReadWriteAccessEvent(
+                          id: widget.id,
+                          isReadOnly: !readOnly,
+                        ),
+                      );
+                    },
+                    icon: readOnly
+                        ? Icon(Icons.lock_rounded)
+                        : Icon(Icons.lock_open_rounded),
+                  ),
+                ),
+                ValueListenableBuilder(
                   valueListenable: isBookMarked,
                   builder: (context, value, child) => IconButton(
                     onPressed: () {
                       //Update the local state
-                      isBookMarked.value = !isBookMarked.value;
+                      isBookMarked.value = !value;
                       //Update the database
                       context.read<NotesBloc>().add(
-                        BookmarkNotesEvent(
-                          id: widget.id,
-                          bookMark: !isBookMarked.value,
-                        ),
+                        BookmarkNotesEvent(id: widget.id, bookMark: !value),
                       );
                     },
                     icon: value
@@ -103,60 +123,51 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
               ],
             ),
             body: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    focusNode: titleFocusNode,
-                    onEditingComplete: () => contentFocusNode.nextFocus(),
-                    onTapOutside: (event) => contentFocusNode.nextFocus(),
-                    keyboardAppearance: Theme.of(context).brightness,
-                    minLines: 1,
-                    maxLines: 3,
-                    maxLength: 55,
-                    buildCounter:
-                        (
-                          context, {
-                          required currentLength,
-                          required isFocused,
-                          required maxLength,
-                        }) => null,
-                    controller: titleController,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: Theme.of(context).textTheme.titleLarge?.color,
-                      fontSize: 30,
-                    ),
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.all(20),
-                      hintText: 'Title 👀',
-                      hintStyle: TextStyle(
-                        color: Theme.of(context).textTheme.titleMedium?.color,
+              child: ValueListenableBuilder(
+                valueListenable: readOnlyNotifier,
+                builder: (context, readOnly, child) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      readOnly: readOnly,
+                      focusNode: titleFocusNode,
+                      onEditingComplete: () => contentFocusNode.nextFocus(),
+                      onTapOutside: (event) => contentFocusNode.nextFocus(),
+                      keyboardAppearance: Theme.of(context).brightness,
+                      minLines: 1,
+                      maxLines: 3,
+                      maxLength: 55,
+                      buildCounter:
+                          (
+                            context, {
+                            required currentLength,
+                            required isFocused,
+                            required maxLength,
+                          }) => null,
+                      controller: titleController,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Theme.of(context).textTheme.titleLarge?.color,
                         fontSize: 30,
                       ),
-                      border: InputBorder.none,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20),
-                    child: Row(
-                      spacing: 10,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.note.modifiedAt.yMMMEdFormat,
-                          style: TextStyle(
-                            color: Theme.of(
-                              context,
-                            ).textTheme.titleMedium?.color,
-                            fontSize: 15,
-                          ),
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.all(20),
+                        hintText: 'Title 👀',
+                        hintStyle: TextStyle(
+                          color: Theme.of(context).textTheme.titleMedium?.color,
+                          fontSize: 30,
                         ),
-                        Text('|'),
-                        ValueListenableBuilder(
-                          valueListenable: contentController,
-                          builder: (context, value, child) => Text(
-                            "${value.text.length} characters",
+                        border: InputBorder.none,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20),
+                      child: Row(
+                        spacing: 10,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.note.modifiedAt.yMMMEdFormat,
                             style: TextStyle(
                               color: Theme.of(
                                 context,
@@ -164,35 +175,49 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
                               fontSize: 15,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  TextField(
-                    focusNode: contentFocusNode,
-                    onEditingComplete: () => contentFocusNode.unfocus(),
-                    onTapOutside: (event) => contentFocusNode.unfocus(),
-                    keyboardAppearance: Theme.of(context).brightness,
-                    minLines: 1,
-                    maxLines: 1000,
-                    controller: contentController,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      color: Theme.of(context).textTheme.titleLarge?.color,
-                      fontSize: 20,
-                    ),
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.all(20),
-                      hintMaxLines: 100,
-                      hintText: 'Type something...',
-                      hintStyle: TextStyle(
-                        color: Theme.of(context).textTheme.titleMedium?.color,
-                        fontSize: 18,
+                          Text('|'),
+                          ValueListenableBuilder(
+                            valueListenable: contentController,
+                            builder: (context, value, child) => Text(
+                              "${value.text.length} characters",
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).textTheme.titleMedium?.color,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      border: InputBorder.none,
                     ),
-                  ),
-                ],
+                    TextField(
+                      readOnly: readOnly,
+                      focusNode: contentFocusNode,
+                      onEditingComplete: () => contentFocusNode.unfocus(),
+                      onTapOutside: (event) => contentFocusNode.unfocus(),
+                      keyboardAppearance: Theme.of(context).brightness,
+                      minLines: 1,
+                      maxLines: 1000,
+                      controller: contentController,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        color: Theme.of(context).textTheme.titleLarge?.color,
+                        fontSize: 20,
+                      ),
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.all(20),
+                        hintMaxLines: 100,
+                        hintText: 'Type something...',
+                        hintStyle: TextStyle(
+                          color: Theme.of(context).textTheme.titleMedium?.color,
+                          fontSize: 18,
+                        ),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
