@@ -12,7 +12,6 @@ import 'package:scribble/src/features/notes/domain/usecase/delete_all_notes_usec
 import 'package:scribble/src/features/notes/domain/usecase/get_notes_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/restore_notes_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/update_note_usecase.dart';
-import 'src/features/notes/presentation/bloc/bookmark_cubit.dart';
 import 'src/features/todos/presentation/bloc/todos_bloc/todos_bloc.dart';
 import 'src/features/home/presentation/bloc/page_view_cubit.dart';
 import 'src/features/settings/presentation/bloc/settings_cubit.dart';
@@ -100,9 +99,6 @@ class MyApp extends StatelessWidget {
 
         // Page View Bloc
         BlocProvider(create: (context) => PageViewCubit()),
-
-        // Bookmark Bloc
-        BlocProvider(create: (context) => BookmarkCubit()),
       ],
       child: BlocBuilder<SettingsCubit, Settings>(
         builder: (context, state) {
