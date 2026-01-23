@@ -2,7 +2,7 @@ name: scribble
 description: "A simple notes app"
 publish_to: 'none' 
 
-version: 4.0.0+7
+version: 4.1.0+8
 
 environment:
   sdk: '>=3.10.0 <4.0.0'

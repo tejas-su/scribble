@@ -28,23 +28,15 @@ https://play.google.com/store/apps/details?id=com.widgetsandco.scribble
 
 ## How to use it
 
-1. To create a note just click on the plus icon on the bottom right corner in your home page
+1. To create a note just click the button on the bottom right corner in your home page
 2. To update a note just click on a note
-3. To delete a note just long press on any note
-
-## Note
-
-1. The current app does not support auto save, so you have to save it manually everytime.
-2. There is no recycle bin, once deleted it cannot be restored
+3. To delete a note, long press on any note to bring the menu
+4. To modify the note as read only click on the lock icon
 
 ## Installation
 
 1. Clone the repo and Build the apk or app bundles using <flutter build apk> or <flutter build appbundlke>
 2. Or just download the app by going to the resource section in the same page here
-
-## Futue updates 
-
-1. Will try to bring the auto save and the recycle bin option and cloud storage if possible
 
 ## What can you do?
 
