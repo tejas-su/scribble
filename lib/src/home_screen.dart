@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:scribble/src/features/home/presentation/bloc/page_view_cubit.dart';
 import 'package:scribble/src/features/settings/presentation/screen/settings_screen.dart';
-import 'features/notes/presentation/bloc/page_view_cubit.dart';
 import 'features/notes/presentation/screen/notes_screen.dart';
 import 'features/todos/presentation/screen/todo_screen.dart';
 

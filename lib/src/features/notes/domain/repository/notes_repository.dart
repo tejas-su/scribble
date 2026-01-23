@@ -25,6 +25,12 @@ abstract class NotesRepository {
   /// Bookmark a note
   Future<void> bookmarkNote(int id);
 
+  /// Make a note readonly
+  Future<void> makeNoteReadOnly(int id);
+
+  /// Give write access to a note
+  Future<void> giveWriteAccess(int id);
+
   /// Archive a note
   Future<void> archiveNote(int id);
 

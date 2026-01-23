@@ -10,6 +10,7 @@ class NotesModel extends Note {
     required super.isBookMarked,
     required super.isArchived,
     required super.isDeleted,
+    required super.isReadOnly,
   });
 
   Map<String, dynamic> toMap() {
@@ -33,6 +34,7 @@ class NotesModel extends Note {
     bool? isBookMarked,
     bool? isArchived,
     bool? isDeleted,
+    bool? isReadOnly,
   }) {
     return NotesModel(
       title: title ?? this.title,
@@ -42,6 +44,7 @@ class NotesModel extends Note {
       isBookMarked: isBookMarked ?? this.isBookMarked,
       isArchived: isArchived ?? this.isArchived,
       isDeleted: isDeleted ?? this.isDeleted,
+      isReadOnly: isReadOnly ?? this.isReadOnly,
     );
   }
 
@@ -54,6 +57,7 @@ class NotesModel extends Note {
     isBookMarked: map["isBookMarked"] == 1,
     isArchived: map["isArchived"] == 1,
     isDeleted: map["isDeleted"] == 1,
+    isReadOnly: map["isReadOnly"]==1,
   );
 
   factory NotesModel.fromEntity(Note note) => NotesModel(
@@ -65,5 +69,6 @@ class NotesModel extends Note {
     isBookMarked: note.isBookMarked,
     isArchived: note.isArchived,
     isDeleted: note.isDeleted,
+    isReadOnly: note.isReadOnly,
   );
 }
