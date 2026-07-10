@@ -90,6 +90,16 @@ class BookmarkNotesEvent extends NotesEvent {
   List<Object> get props => [id, bookMark];
 }
 
+class PinNotesEvent extends NotesEvent {
+  final int id;
+  final bool pin;
+
+  const PinNotesEvent({required this.id, required this.pin});
+
+  @override
+  List<Object> get props => [id, pin];
+}
+
 final class DeleteAllNotesevent extends NotesEvent {}
 
 final class SearchNotesEvent extends NotesEvent {

@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 ///determines whether delete action is permanent or soft delete
 ///[onDelete] is the callback function to be called when delete is pressed
 ///[onBookmark] is the callback function to be called when bookmark is pressed
+///[isPinned] is true if the note is currently pinned, used to choose the Pin/Unpin label
+///[onPin] is the callback function to be called when pin/unpin is pressed
 ///[onShare] is the callback function to be called when share is pressed
 ///[onArchive] is the callback function to be called when archive is pressed
 ///[onRestore] is the callback function to be called when restore is pressed
@@ -16,8 +18,10 @@ void showMenuOverlay({
   required RelativeRect rect,
   bool restoreNote = false,
   bool isDeletedNote = false,
+  bool isPinned = false,
   VoidCallback? onDelete,
   VoidCallback? onBookmark,
+  VoidCallback? onPin,
   VoidCallback? onShare,
   VoidCallback? onArchive,
   VoidCallback? onRestore,
@@ -32,7 +36,7 @@ void showMenuOverlay({
   }
 
   const double menuWidth = 150.0;
-  const double menuHeight = 157.0;
+  const double menuHeight = 196.0;
   const double padding = 8.0;
   final Size screenSize = MediaQuery.of(context).size;
 
@@ -143,6 +147,14 @@ void showMenuOverlay({
                           onTap: () {
                             removeOverlay();
                             onBookmark!();
+                          },
+                        ),
+                        // Pin option
+                        _MenuOption(
+                          label: isPinned ? 'Unpin' : 'Pin',
+                          onTap: () {
+                            removeOverlay();
+                            onPin!();
                           },
                         ),
                         // Share option

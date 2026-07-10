@@ -12,6 +12,7 @@ void main() {
         modifiedAt: '2026-01-02',
         createdAt: '2026-01-01',
         isBookMarked: true,
+        isPinned: true,
         isArchived: false,
         isDeleted: true,
         isReadOnly: false,
@@ -25,6 +26,7 @@ void main() {
       expect(map['modifiedAt'], '2026-01-02');
       expect(map['createdAt'], '2026-01-01');
       expect(map['isBookMarked'], 1);
+      expect(map['isPinned'], 1);
       expect(map['isArchived'], 0);
       expect(map['isDeleted'], 1);
       // Note: toMap intentionally omits isReadOnly (not present in the map).
@@ -38,6 +40,7 @@ void main() {
         modifiedAt: 'm',
         createdAt: 'c',
         isBookMarked: false,
+        isPinned: false,
         isArchived: false,
         isDeleted: false,
         isReadOnly: false,
@@ -55,6 +58,7 @@ void main() {
         'modifiedAt': '2026-01-02',
         'createdAt': '2026-01-01',
         'isBookMarked': 1,
+        'isPinned': 1,
         'isArchived': 0,
         'isDeleted': 1,
         'isReadOnly': 0,
@@ -62,6 +66,7 @@ void main() {
 
       expect(model.id, 3);
       expect(model.isBookMarked, isTrue);
+      expect(model.isPinned, isTrue);
       expect(model.isArchived, isFalse);
       expect(model.isDeleted, isTrue);
       expect(model.isReadOnly, isFalse);
@@ -75,12 +80,14 @@ void main() {
         'modifiedAt': 'm',
         'createdAt': 'c',
         'isBookMarked': 2,
+        'isPinned': null,
         'isArchived': null,
         'isDeleted': 0,
         'isReadOnly': 0,
       });
 
       expect(model.isBookMarked, isFalse);
+      expect(model.isPinned, isFalse);
       expect(model.isArchived, isFalse);
     });
   });
@@ -94,6 +101,7 @@ void main() {
         modifiedAt: 'mod',
         createdAt: 'created',
         isBookMarked: true,
+        isPinned: true,
         isArchived: true,
         isDeleted: false,
         isReadOnly: true,
@@ -107,6 +115,7 @@ void main() {
       expect(model.modifiedAt, 'mod');
       expect(model.createdAt, 'created');
       expect(model.isBookMarked, isTrue);
+      expect(model.isPinned, isTrue);
       expect(model.isArchived, isTrue);
       expect(model.isDeleted, isFalse);
       expect(model.isReadOnly, isTrue);
@@ -121,6 +130,7 @@ void main() {
       modifiedAt: 'mod',
       createdAt: 'created',
       isBookMarked: false,
+      isPinned: false,
       isArchived: false,
       isDeleted: false,
       isReadOnly: false,
@@ -133,6 +143,13 @@ void main() {
       expect(updated.isBookMarked, isTrue);
       expect(updated.content, base.content);
       expect(updated.createdAt, base.createdAt);
+    });
+
+    test('overrides isPinned', () {
+      final updated = base.copyWith(isPinned: true);
+
+      expect(updated.isPinned, isTrue);
+      expect(updated.isBookMarked, base.isBookMarked);
     });
 
     test('with no arguments returns an equivalent copy', () {

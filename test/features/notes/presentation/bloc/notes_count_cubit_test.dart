@@ -10,6 +10,7 @@ import 'package:scribble/src/features/notes/domain/usecase/delete_all_notes_usec
 import 'package:scribble/src/features/notes/domain/usecase/delete_note_permanently_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/get_notes_count_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/get_notes_usecase.dart';
+import 'package:scribble/src/features/notes/domain/usecase/pin_note_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/read_write_access_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/restore_notes_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/soft_delete_note_usecase.dart';
@@ -33,6 +34,7 @@ const testNote = Note(
   modifiedAt: '2026-01-02',
   createdAt: '2026-01-01',
   isBookMarked: false,
+  isPinned: false,
   isArchived: false,
   isDeleted: false,
   isReadOnly: false,
@@ -92,6 +94,7 @@ void main() {
       deleteNotePermanentlyUseCase: DeleteNotePermanentlyUseCase(repository),
       getNotesUseCase: GetNotesUseCase(repository),
       bookmarkNoteUseCase: BookmarkNoteUseCase(repository),
+      pinNoteUseCase: PinNoteUseCase(repository),
       archiveNotesUseCase: ArchiveNotesUseCase(repository),
       restoreNotesUseCase: RestoreNotesUseCase(repository),
       deleteAllNotesUseCase: DeleteAllNotesUseCase(repository),

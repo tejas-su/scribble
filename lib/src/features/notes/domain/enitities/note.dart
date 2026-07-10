@@ -13,6 +13,8 @@ class Note extends Equatable {
 
   final bool isBookMarked;
 
+  final bool isPinned;
+
   final bool isArchived;
 
   final bool isDeleted;
@@ -26,6 +28,7 @@ class Note extends Equatable {
     required this.modifiedAt,
     required this.createdAt,
     required this.isBookMarked,
+    required this.isPinned,
     required this.isArchived,
     required this.isDeleted,
     required this.isReadOnly,
@@ -38,6 +41,7 @@ class Note extends Equatable {
     createdAt,
     isArchived,
     isBookMarked,
+    isPinned,
     isReadOnly,
   ];
 }

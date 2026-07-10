@@ -127,6 +127,24 @@ class NotesRepositoryImpl implements NotesRepository {
   }
 
   @override
+  Future<void> pinNote(int id) async {
+    try {
+      await _sqfliteNotesDatabaseService.pinNote(id);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> unpinNote(int id) async {
+    try {
+      await _sqfliteNotesDatabaseService.unpinNote(id);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
   Future<void> giveWriteAccess(int id) async {
     try {
       await _sqfliteNotesDatabaseService.giveWriteAccess(id);

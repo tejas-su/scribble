@@ -23,7 +23,7 @@ class SqfliteNotesDatabaseService {
     try {
       return await openDatabase(
         path,
-        version: 2,
+        version: 3,
         onCreate: _createDB,
         onUpgrade: _onUpgrade,
       );
@@ -41,6 +41,7 @@ class SqfliteNotesDatabaseService {
         modifiedAt TEXT NOT NULL,
         createdAt TEXT NOT NULL,
         isBookMarked INTEGER NOT NULL DEFAULT 0,
+        isPinned INTEGER NOT NULL DEFAULT 0,
         isArchived INTEGER NOT NULL DEFAULT 0,
         isDeleted INTEGER NOT NULL DEFAULT 0,
         isReadOnly INTEGER NOT NULL DEFAULT 0
@@ -51,16 +52,23 @@ class SqfliteNotesDatabaseService {
     await db.execute('CREATE INDEX idx_date ON notes(modifiedAt)');
     await db.execute('CREATE INDEX idx_createdAt ON notes(createdAt)');
     await db.execute('CREATE INDEX idx_bookmark ON notes(isBookmarked)');
+    await db.execute('CREATE INDEX idx_pinned ON notes(isPinned)');
     await db.execute('CREATE INDEX idx_archived ON notes(isArchived)');
     await db.execute('CREATE INDEX idx_title_content ON notes(title, content)');
   }
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
     try {
-      if (oldVersion < newVersion) {
+      if (oldVersion < 2) {
         await db.execute(
           'ALTER TABLE notes ADD COLUMN isReadOnly INTEGER NOT NULL DEFAULT 0',
         );
+      }
+      if (oldVersion < 3) {
+        await db.execute(
+          'ALTER TABLE notes ADD COLUMN isPinned INTEGER NOT NULL DEFAULT 0',
+        );
+        await db.execute('CREATE INDEX idx_pinned ON notes(isPinned)');
       }
     } catch (e) {
       rethrow;
@@ -150,6 +158,12 @@ class SqfliteNotesDatabaseService {
       orderBy = 'datetime(modifiedAt) DESC';
     } else {
       orderBy = 'datetime(createdAt) DESC';
+    }
+
+    // Pinned notes float to the top only in the default/unfiltered view
+    final bool isDefaultView = !onlyBookmarked && !onlyDeleted && !onlyArchived;
+    if (isDefaultView) {
+      orderBy = 'isPinned DESC, $orderBy';
     }
 
     String whereClause = _buildBaseWhereClause(
@@ -276,6 +290,36 @@ class SqfliteNotesDatabaseService {
       );
     } catch (e) {
       throw Exception("Failed to unbookmark note");
+    }
+  }
+
+  /// Pin a note
+  Future<int> pinNote(int id) async {
+    final db = await instance.database;
+    try {
+      return await db.update(
+        'notes',
+        {'isPinned': 1},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Failed to pin note");
+    }
+  }
+
+  /// Unpin a note
+  Future<int> unpinNote(int id) async {
+    final db = await instance.database;
+    try {
+      return await db.update(
+        'notes',
+        {'isPinned': 0},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Failed to unpin note");
     }
   }
 

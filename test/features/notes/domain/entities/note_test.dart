@@ -9,6 +9,7 @@ void main() {
     String modifiedAt = '2026-01-01',
     String createdAt = '2026-01-01',
     bool isBookMarked = false,
+    bool isPinned = false,
     bool isArchived = false,
     bool isDeleted = false,
     bool isReadOnly = false,
@@ -20,6 +21,7 @@ void main() {
       modifiedAt: modifiedAt,
       createdAt: createdAt,
       isBookMarked: isBookMarked,
+      isPinned: isPinned,
       isArchived: isArchived,
       isDeleted: isDeleted,
       isReadOnly: isReadOnly,
@@ -57,6 +59,13 @@ void main() {
       expect(
         buildNote(isBookMarked: true),
         isNot(equals(buildNote(isBookMarked: false))),
+      );
+    });
+
+    test('differs when isPinned changes', () {
+      expect(
+        buildNote(isPinned: true),
+        isNot(equals(buildNote(isPinned: false))),
       );
     });
 
