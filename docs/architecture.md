@@ -36,6 +36,7 @@ Every feature exposes state via `flutter_bloc`:
 | Feature | State holder | Type |
 |---|---|---|
 | Notes | `NotesBloc` ([lib/src/features/notes/presentation/bloc/notes_bloc/notes_bloc.dart](../lib/src/features/notes/presentation/bloc/notes_bloc/notes_bloc.dart)) | `Bloc<NotesEvent, NotesState>` |
+| Notes count (drawer badges) | `NotesCountCubit` ([lib/src/features/notes/presentation/bloc/notes_count_cubit/notes_count_cubit.dart](../lib/src/features/notes/presentation/bloc/notes_count_cubit/notes_count_cubit.dart)) | `Cubit<NotesCountState>` |
 | Todos | `TodosBloc` ([lib/src/features/todos/presentation/bloc/todos_bloc/todos_bloc.dart](../lib/src/features/todos/presentation/bloc/todos_bloc/todos_bloc.dart)) | `Bloc<TodosEvent, TodosState>` |
 | Settings | `SettingsCubit` ([lib/src/features/settings/presentation/bloc/settings_cubit.dart](../lib/src/features/settings/presentation/bloc/settings_cubit.dart)) | `Cubit<Settings>` |
 | Home page switching | `PageViewCubit` ([lib/src/features/home/presentation/bloc/page_view_cubit.dart](../lib/src/features/home/presentation/bloc/page_view_cubit.dart)) | `Cubit<int>` |
@@ -43,7 +44,9 @@ Every feature exposes state via `flutter_bloc`:
 All blocs/cubits are provided once at the app root via `MultiBlocProvider` in
 [lib/main.dart](../lib/main.dart), so any screen can reach them with `context.read<T>()` /
 `context.watch<T>()`. `SettingsCubit` is provided first because `NotesBloc` reads the initial
-sort preference from it at construction time.
+sort preference from it at construction time. `NotesCountCubit` is provided right after
+`NotesBloc` because it reads `context.read<NotesBloc>()` at construction and subscribes to its
+stream to keep the drawer's count badges live.
 
 Sealed classes (`sealed class NotesEvent`, `sealed class NotesState`) are used for events/states
 so `switch` expressions in the UI are exhaustive and compiler-checked.

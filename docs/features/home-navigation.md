@@ -17,13 +17,20 @@ mechanism between them. It also owns the one piece of navigation-related state
 - **Drawer** — opened from the app bar's menu icon. Entries:
   - **Notes** — switches to page 0 and dispatches `LoadNotesEvent` (resets to the default,
     unfiltered notes list — important if the user was previously viewing Deleted/Archived/
-    Bookmarks).
+    Bookmarks). Shows a count badge (total non-deleted, non-archived notes).
   - **Todos** — switches to page 1.
-  - **Deleted** — switches to page 0 and dispatches `LoadDeletedNotesEvent`.
-  - **Archived** — switches to page 0 and dispatches `LoadArchivedNotesEvent`.
-  - **Bookmarks** — switches to page 0 and dispatches `LoadBookmarkedNotesEvent`.
+  - **Deleted** — switches to page 0 and dispatches `LoadDeletedNotesEvent`. No count badge.
+  - **Archived** — switches to page 0 and dispatches `LoadArchivedNotesEvent`. Shows a count
+    badge.
+  - **Bookmarks** — switches to page 0 and dispatches `LoadBookmarkedNotesEvent`. Shows a count
+    badge.
   - **Settings** — pushes `SettingsScreen` as a new route (the only drawer item that navigates
     away from the home shell rather than switching pages/state).
+
+  The count badges are pill widgets (`_CountBadge`, private to `scribble_drawer.dart`) driven by
+  `context.watch<NotesCountCubit>().state` — see
+  [Notes → State management — `NotesCountCubit`](notes.md#state-management--notescountcubit).
+  Each badge is hidden when its count is 0.
 
 **Important:** Deleted, Archived, and Bookmarks are *not* separate screens — they're all
 rendered by the same `NotesScreen` widget on page 0, with `NotesBloc`'s current state

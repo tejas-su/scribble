@@ -8,7 +8,7 @@ maintainers.
 
 - [Architecture](architecture.md) — project structure, layering, state management, and storage
 - Features
-  - [Notes](features/notes.md) — create, edit, search, sort, bookmark, archive, delete, read-only, share
+  - [Notes](features/notes.md) — create, edit, search, sort, bookmark, pin, archive, delete, read-only, share
   - [Todos](features/todos.md) — a simple daily checklist
   - [Settings](features/settings.md) — theme, layout, sort preference, danger-zone actions
   - [Home & Navigation](features/home-navigation.md) — app shell, drawer, page switching

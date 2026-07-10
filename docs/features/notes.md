@@ -3,8 +3,8 @@
 ## Overview
 
 Notes are the core feature of Scribble: free-form title + content entries that can be created,
-edited, searched, sorted, bookmarked, archived, soft-deleted (trash), permanently deleted, and
-marked read-only. Notes are persisted in SQLite and loaded with pagination.
+edited, searched, sorted, bookmarked, pinned, archived, soft-deleted (trash), permanently deleted,
+and marked read-only. Notes are persisted in SQLite and loaded with pagination.
 
 ## User-facing behavior
 
@@ -21,6 +21,10 @@ marked read-only. Notes are persisted in SQLite and loaded with pagination.
 - **Bookmark** — tap the bookmark icon in the editor, or use the long-press context menu on a
   note card. Bookmarked notes show a bookmark badge on their card and are accessible from the
   drawer's "Bookmarks" entry.
+- **Pin** — long-press a note card → "Pin"/"Unpin". Pinned notes sort to the top of the main
+  (unfiltered) notes list, above the modified/created-date ordering; pin has no effect on the
+  Bookmarks/Archived/Deleted views. A pinned note's card shows a pin icon instead of the bookmark
+  icon — see [Edge cases](#edge-cases--gotchas).
 - **Archive** — long-press a note card → "Archive". Archived notes are hidden from the main list
   and accessible from the drawer's "Archived" entry, from where they can be restored or deleted.
 - **Delete (soft)** — long-press a note card → "Delete". This is a *soft* delete (`isDeleted =
@@ -43,6 +47,9 @@ marked read-only. Notes are persisted in SQLite and loaded with pagination.
   dialog). This bypasses soft-delete entirely.
 - **Infinite scroll** — scrolling past 80% of the list triggers loading the next page (20 notes
   at a time).
+- **Drawer count badges** — the drawer's "Notes", "Archived", and "Bookmarks" entries each show a
+  pill badge with the live count of notes in that view (hidden when the count is 0). "Deleted"
+  has no badge. See [State management — `NotesCountCubit`](#state-management--notescountcubit).
 
 ## Data model
 
@@ -58,6 +65,7 @@ class Note extends Equatable {
   final String modifiedAt;   // ISO 8601 string
   final String createdAt;    // ISO 8601 string
   final bool isBookMarked;
+  final bool isPinned;
   final bool isArchived;
   final bool isDeleted;
   final bool isReadOnly;
@@ -80,15 +88,21 @@ Table `notes`, created by `SqfliteNotesDatabaseService._createDB`
 | `modifiedAt` | `TEXT NOT NULL` | ISO 8601 |
 | `createdAt` | `TEXT NOT NULL` | ISO 8601 |
 | `isBookMarked` | `INTEGER NOT NULL DEFAULT 0` | boolean as 0/1 |
+| `isPinned` | `INTEGER NOT NULL DEFAULT 0` | boolean as 0/1, added in schema v3 via `_onUpgrade` |
 | `isArchived` | `INTEGER NOT NULL DEFAULT 0` | boolean as 0/1 |
 | `isDeleted` | `INTEGER NOT NULL DEFAULT 0` | boolean as 0/1, soft-delete flag |
 | `isReadOnly` | `INTEGER NOT NULL DEFAULT 0` | added in schema v2 via `_onUpgrade` |
 
 Indexes: `idx_date` (`modifiedAt`), `idx_createdAt` (`createdAt`), `idx_bookmark`
-(`isBookmarked`), `idx_archived` (`isArchived`), `idx_title_content` (`title, content`).
+(`isBookmarked`), `idx_pinned` (`isPinned`), `idx_archived` (`isArchived`), `idx_title_content`
+(`title, content`).
 
-Database file: `notes.db`, current schema `version: 2`. `_onUpgrade` adds the `isReadOnly`
-column when upgrading from v1.
+Database file: `notes.db`, current schema `version: 3`. `_onUpgrade` runs staged `if (oldVersion <
+N)` checks: v1→v2 adds `isReadOnly`, v2→v3 adds `isPinned` + `idx_pinned`.
+
+`getNotes()` prepends `isPinned DESC` to the `ORDER BY` clause, but **only for the default,
+unfiltered view** (`!onlyBookmarked && !onlyDeleted && !onlyArchived`) — pinning has no effect on
+sort order in the Bookmarks/Archived/Deleted views.
 
 ### Legacy Hive model — `Notes`
 
@@ -116,7 +130,9 @@ notes/
 │   ├── repository/notes_repository.dart        # NotesRepository interface
 │   └── usecase/                                # One class per operation (see below)
 └── presentation/
-    ├── bloc/notes_bloc/                        # NotesBloc, NotesEvent, NotesState
+    ├── bloc/
+    │   ├── notes_bloc/                         # NotesBloc, NotesEvent, NotesState
+    │   └── notes_count_cubit/                  # NotesCountCubit, NotesCountState
     ├── screen/                                 # notes_screen, new_notes_screen, update_note_screen, notes_loading_screen
     └── widgets/                                # notes_card.dart, empty_placeholder.dart
 ```
@@ -127,26 +143,29 @@ Each wraps a single `NotesRepository` method as a callable class
 (`lib/src/features/notes/domain/usecase/`):
 
 `AddNoteUseCase`, `UpdateNoteUseCase`, `SoftDeleteNoteUseCase`, `DeleteNotePermanentlyUseCase`,
-`DeleteAllNotesUseCase`, `GetNotesUseCase`, `BookmarkNoteUseCase`, `ArchiveNotesUseCase`,
-`RestoreNotesUseCase`, `ReadWriteAccessUsecase`.
+`DeleteAllNotesUseCase`, `GetNotesUseCase`, `BookmarkNoteUseCase`, `PinNoteUseCase`,
+`ArchiveNotesUseCase`, `RestoreNotesUseCase`, `ReadWriteAccessUsecase`, `GetNotesCountUseCase`.
 
 ### `NotesRepository` interface
 
 [lib/src/features/notes/domain/repository/notes_repository.dart](../../lib/src/features/notes/domain/repository/notes_repository.dart)
 declares `addNote`, `updateNote`, `softDeleteNote`, `deleteNotePermanently`, `deleteAllNotes`,
-`unbookmarkNote`, `restoreNote`, `bookmarkNote`, `makeNoteReadOnly`, `giveWriteAccess`,
-`archiveNote`, and `getNotes(...)` with filter/sort/pagination parameters. Implemented by
-`NotesRepositoryImpl`, which delegates every call to `SqfliteNotesDatabaseService`.
+`unbookmarkNote`, `restoreNote`, `bookmarkNote`, `pinNote`, `unpinNote`, `makeNoteReadOnly`,
+`giveWriteAccess`, `archiveNote`, `getNotes(...)` with filter/sort/pagination parameters, and
+`getNotesCount(...)` with the same filter parameters. Implemented by `NotesRepositoryImpl`, which
+delegates every call to `SqfliteNotesDatabaseService`. The sqflite service shares a
+`_buildBaseWhereClause(...)` helper between `getNotes()` and `getNotesCount()` (the latter runs
+`SELECT COUNT(*) ... WHERE $whereClause`).
 
 ### State management — `NotesBloc`
 
 [lib/src/features/notes/presentation/bloc/notes_bloc/notes_bloc.dart](../../lib/src/features/notes/presentation/bloc/notes_bloc/notes_bloc.dart)
 
 **Events** (`notes_event.dart`): `LoadNotesEvent`, `AddNotesEvent`, `UpdateNotesEvent`,
-`DeleteAllNotesevent`, `BookmarkNotesEvent`, `SearchNotesEvent`, `LoadMoreNotesEvent`,
-`LoadDeletedNotesEvent`, `LoadArchivedNotesEvent`, `DeleteNotesEvent` (has a `softDelete` flag),
-`RestoreNotesEvent` (has an `isDeletedNote` flag to distinguish trash-restore from
-archive-restore), `ArchiveNotesEvent`, `LoadBookmarkedNotesEvent`, `GiveReadWriteAccessEvent`.
+`DeleteAllNotesevent`, `BookmarkNotesEvent`, `PinNotesEvent` (`{id, pin}`), `SearchNotesEvent`,
+`LoadMoreNotesEvent`, `LoadDeletedNotesEvent`, `LoadArchivedNotesEvent`, `DeleteNotesEvent` (has a
+`softDelete` flag), `RestoreNotesEvent` (has an `isDeletedNote` flag to distinguish trash-restore
+from archive-restore), `ArchiveNotesEvent`, `LoadBookmarkedNotesEvent`, `GiveReadWriteAccessEvent`.
 
 **States** (`notes_state.dart`): `NotesLoadingState`, `NotesLoadedState` (carries `notes`,
 `searchQuery`, `hasMore`, `isLoadingMore`, and the mutually-relevant `isDeleted` / `isArchived` /
@@ -165,16 +184,31 @@ archive-restore), `ArchiveNotesEvent`, `LoadBookmarkedNotesEvent`, `GiveReadWrit
 - `NotesBloc` depends on `SettingsCubit` (constructor injection) to read the
   `sortByModifiedDate` preference — see [Settings](settings.md).
 
+### State management — `NotesCountCubit`
+
+[lib/src/features/notes/presentation/bloc/notes_count_cubit/notes_count_cubit.dart](../../lib/src/features/notes/presentation/bloc/notes_count_cubit/notes_count_cubit.dart)
+— a `Cubit<NotesCountState>` that drives the drawer's count badges. Constructed with
+`GetNotesCountUseCase` and a `NotesBloc` reference; it subscribes to `notesBloc.stream` and calls
+`refreshCounts()` on every emission (plus once at construction), so any note mutation anywhere in
+the app keeps the badges live. `refreshCounts()` fires three `getNotesCountUseCase()` calls in
+parallel (default, `onlyArchived: true`, `onlyBookmarked: true`) and emits
+`NotesCountState(notesCount, archivedCount, bookmarkedCount)` — there is no `deletedCount`. If a
+refresh throws, the previous counts are kept rather than clearing the badges.
+
+`NotesCountCubit` is provided in the root `MultiBlocProvider` ([lib/main.dart](../../lib/main.dart))
+immediately after `NotesBloc`, since it reads `context.read<NotesBloc>()` at construction.
+
 ### Key widgets
 
 - `NotesCard` ([lib/src/features/notes/presentation/widgets/notes_card.dart](../../lib/src/features/notes/presentation/widgets/notes_card.dart))
   — the note tile. Renders title/content with `buildHighlightedText` (search highlighting), the
-  formatted date, and an optional bookmark badge icon.
+  formatted date, and a single status icon: pin takes priority over bookmark (see
+  [Edge cases](#edge-cases--gotchas)).
 - `EmptyPlaceholder` — shown when the current list (respecting search/filter) is empty.
 - `NotesLoadingScreen` — loading state placeholder (shimmer).
 - Long-press on a card opens `showMenuOverlay`
   ([lib/src/core/utils/menu_overlay.dart](../../lib/src/core/utils/menu_overlay.dart)), a custom
-  positioned overlay (not a `PopupMenuButton`) offering Delete/Bookmark/Share/Archive, or
+  positioned overlay (not a `PopupMenuButton`) offering Delete/Bookmark/Pin/Share/Archive, or
   Restore/Delete-permanently when viewing Archived/Deleted lists.
 
 ## Edge cases / gotchas
@@ -194,10 +228,14 @@ archive-restore), `ArchiveNotesEvent`, `LoadBookmarkedNotesEvent`, `GiveReadWrit
   confirm).
 - **Read-only doesn't block the toolbar.** Marking a note read-only only sets `readOnly: true` on
   the `TextField`s; bookmark/lock/share actions in the app bar remain tappable.
-- **`Note.props` excludes `id`, `isDeleted`, and `isReadOnly`.** `Note`'s `Equatable.props`
-  ([lib/src/features/notes/domain/enitities/note.dart:34-42](../../lib/src/features/notes/domain/enitities/note.dart))
-  omits `id`, `isDeleted`, and `isReadOnly` — two `Note` instances that differ only in those
-  fields compare equal. This mainly affects Bloc state-change detection/tests, not persistence.
+- **`Note.props` excludes `id` and `isDeleted`.** `Note`'s `Equatable.props`
+  ([lib/src/features/notes/domain/enitities/note.dart](../../lib/src/features/notes/domain/enitities/note.dart))
+  omits `id` and `isDeleted` — two `Note` instances that differ only in those fields compare
+  equal. This mainly affects Bloc state-change detection/tests, not persistence. (`isReadOnly` and
+  `isPinned` *are* both included in `props`.)
+- **Pin hides the bookmark badge.** `NotesCard`'s status icon is chosen as `isPinned ?
+  push_pin_rounded : (isBookMarked ? bookmark_rounded : null)` — there's no dual-icon layout, so a
+  note that's both pinned and bookmarked only shows the pin icon on its card.
 
 ## Related files
 
@@ -209,6 +247,7 @@ archive-restore), `ArchiveNotesEvent`, `LoadBookmarkedNotesEvent`, `GiveReadWrit
 | SQLite service | [sqflite_notes_database_service.dart](../../lib/src/features/notes/data/services/sqflite_notes_database_service.dart) |
 | Legacy Hive service | [hive_notes_database.dart](../../lib/src/features/notes/data/services/hive_notes_database.dart) |
 | Bloc | [notes_bloc.dart](../../lib/src/features/notes/presentation/bloc/notes_bloc/notes_bloc.dart) |
+| Count cubit | [notes_count_cubit.dart](../../lib/src/features/notes/presentation/bloc/notes_count_cubit/notes_count_cubit.dart) |
 | List screen | [notes_screen.dart](../../lib/src/features/notes/presentation/screen/notes_screen.dart) |
 | Create screen | [new_notes_screen.dart](../../lib/src/features/notes/presentation/screen/new_notes_screen.dart) |
 | Edit screen | [update_note_screen.dart](../../lib/src/features/notes/presentation/screen/update_note_screen.dart) |
@@ -223,5 +262,7 @@ archive-restore), `ArchiveNotesEvent`, `LoadBookmarkedNotesEvent`, `GiveReadWrit
 `test/features/notes/` covers: entity (`domain/entities/note_test.dart`), models
 (`data/models/notes_model_test.dart`, `notes_test.dart`), repository
 (`data/repository/notes_repository_impl_test.dart`), every use case
-(`domain/usecase/*_usecase_test.dart`, with `notes_repository_mock.dart` as a `mocktail`-based
-fake), and the bloc (`presentation/bloc/notes_bloc_test.dart`).
+(`domain/usecase/*_usecase_test.dart`, including `pin_note_usecase_test.dart` and
+`get_notes_count_usecase_test.dart`, with `notes_repository_mock.dart` as a `mocktail`-based
+fake), the bloc (`presentation/bloc/notes_bloc_test.dart`), and
+`presentation/bloc/notes_count_cubit_test.dart`.
