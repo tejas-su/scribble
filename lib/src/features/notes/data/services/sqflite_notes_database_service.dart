@@ -105,26 +105,13 @@ class SqfliteNotesDatabaseService {
     }
   }
 
-  /// Get all active notes
-  Future<List<NotesModel>> getNotes({
-    String? query,
+  /// Builds the base WHERE clause shared by [getNotes] and [getNotesCount]
+  String _buildBaseWhereClause({
     bool onlyBookmarked = false,
     bool onlyDeleted = false,
     bool onlyArchived = false,
-    int limit = 20,
-    int offset = 0,
-    bool sortByModifiedDate = true,
-  }) async {
-    final db = await instance.database;
+  }) {
     String whereClause;
-    final List<dynamic> whereArgs = [];
-
-    String orderBy;
-    if (sortByModifiedDate) {
-      orderBy = 'datetime(modifiedAt) DESC';
-    } else {
-      orderBy = 'datetime(createdAt) DESC';
-    }
 
     // Determine base filter based on what type of notes to show
     if (onlyDeleted) {
@@ -141,6 +128,35 @@ class SqfliteNotesDatabaseService {
     if (onlyBookmarked) {
       whereClause += ' AND isBookMarked = 1';
     }
+
+    return whereClause;
+  }
+
+  /// Get all active notes
+  Future<List<NotesModel>> getNotes({
+    String? query,
+    bool onlyBookmarked = false,
+    bool onlyDeleted = false,
+    bool onlyArchived = false,
+    int limit = 20,
+    int offset = 0,
+    bool sortByModifiedDate = true,
+  }) async {
+    final db = await instance.database;
+    final List<dynamic> whereArgs = [];
+
+    String orderBy;
+    if (sortByModifiedDate) {
+      orderBy = 'datetime(modifiedAt) DESC';
+    } else {
+      orderBy = 'datetime(createdAt) DESC';
+    }
+
+    String whereClause = _buildBaseWhereClause(
+      onlyBookmarked: onlyBookmarked,
+      onlyDeleted: onlyDeleted,
+      onlyArchived: onlyArchived,
+    );
 
     // Add search query filter if provided
     if (query != null && query.isNotEmpty) {
@@ -162,6 +178,29 @@ class SqfliteNotesDatabaseService {
       return result.map(NotesModel.fromMap).toList();
     } catch (e) {
       throw Exception("Failed to get notes");
+    }
+  }
+
+  /// Get the count of notes matching the given filters
+  Future<int> getNotesCount({
+    bool onlyBookmarked = false,
+    bool onlyDeleted = false,
+    bool onlyArchived = false,
+  }) async {
+    final db = await instance.database;
+    final whereClause = _buildBaseWhereClause(
+      onlyBookmarked: onlyBookmarked,
+      onlyDeleted: onlyDeleted,
+      onlyArchived: onlyArchived,
+    );
+
+    try {
+      final result = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM notes WHERE $whereClause',
+      );
+      return Sqflite.firstIntValue(result) ?? 0;
+    } catch (e) {
+      throw Exception("Failed to get notes count");
     }
   }
 

@@ -179,4 +179,41 @@ void main() {
 
     expect(() => repository.getNotes(), throwsException);
   });
+
+  test('getNotesCount forwards all filter parameters and returns the count', () async {
+    when(
+      () => service.getNotesCount(
+        onlyBookmarked: any(named: 'onlyBookmarked'),
+        onlyDeleted: any(named: 'onlyDeleted'),
+        onlyArchived: any(named: 'onlyArchived'),
+      ),
+    ).thenAnswer((_) async => 4);
+
+    final result = await repository.getNotesCount(
+      onlyBookmarked: true,
+      onlyDeleted: true,
+      onlyArchived: true,
+    );
+
+    expect(result, 4);
+    verify(
+      () => service.getNotesCount(
+        onlyBookmarked: true,
+        onlyDeleted: true,
+        onlyArchived: true,
+      ),
+    ).called(1);
+  });
+
+  test('getNotesCount propagates errors from the service', () async {
+    when(
+      () => service.getNotesCount(
+        onlyBookmarked: any(named: 'onlyBookmarked'),
+        onlyDeleted: any(named: 'onlyDeleted'),
+        onlyArchived: any(named: 'onlyArchived'),
+      ),
+    ).thenThrow(Exception('count failed'));
+
+    expect(() => repository.getNotesCount(), throwsException);
+  });
 }

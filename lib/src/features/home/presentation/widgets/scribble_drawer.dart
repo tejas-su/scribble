@@ -5,6 +5,7 @@ import 'package:scribble/src/features/settings/presentation/bloc/settings_cubit.
 import 'package:scribble/src/features/settings/presentation/screen/settings_screen.dart';
 
 import '../../../notes/presentation/bloc/notes_bloc/notes_bloc.dart';
+import '../../../notes/presentation/bloc/notes_count_cubit/notes_count_cubit.dart';
 
 class ScribbleDrawer extends StatelessWidget {
   final ValueNotifier<int> pageNotifier;
@@ -13,6 +14,7 @@ class ScribbleDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final counts = context.watch<NotesCountCubit>().state;
     return Drawer(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -51,6 +53,9 @@ class ScribbleDrawer extends StatelessWidget {
                       selected: pageNotifier.value == 0,
                       leading: const Icon(Icons.edit_rounded),
                       title: const Text('Notes'),
+                      trailing: counts.notesCount > 0
+                          ? _CountBadge(count: counts.notesCount)
+                          : null,
                       onTap: () {
                         pageNotifier.value = 0;
                         Navigator.of(context).pop();
@@ -133,6 +138,9 @@ class ScribbleDrawer extends StatelessWidget {
                       selected: pageNotifier.value == 3,
                       leading: const Icon(Icons.archive_rounded),
                       title: const Text('Archived'),
+                      trailing: counts.archivedCount > 0
+                          ? _CountBadge(count: counts.archivedCount)
+                          : null,
                       onTap: () {
                         pageNotifier.value = 3;
                         Navigator.of(context).pop();
@@ -158,6 +166,9 @@ class ScribbleDrawer extends StatelessWidget {
                       selected: pageNotifier.value == 4,
                       leading: const Icon(Icons.bookmark_rounded),
                       title: const Text('Bookmarks'),
+                      trailing: counts.bookmarkedCount > 0
+                          ? _CountBadge(count: counts.bookmarkedCount)
+                          : null,
                       onTap: () {
                         pageNotifier.value = 4;
                         Navigator.of(context).pop();
@@ -199,5 +210,29 @@ class ScribbleDrawer extends StatelessWidget {
           ),
         ),
       );
+  }
+}
+
+class _CountBadge extends StatelessWidget {
+  final int count;
+  const _CountBadge({required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.secondaryContainer,
+        borderRadius: BorderRadius.circular(100),
+      ),
+      child: Text(
+        '$count',
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSecondaryContainer,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
   }
 }

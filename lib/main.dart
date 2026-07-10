@@ -11,6 +11,8 @@ import 'package:scribble/src/features/notes/domain/usecase/soft_delete_note_usec
 import 'package:scribble/src/features/notes/domain/usecase/delete_note_permanently_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/delete_all_notes_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/get_notes_usecase.dart';
+import 'package:scribble/src/features/notes/domain/usecase/get_notes_count_usecase.dart';
+import 'src/features/notes/presentation/bloc/notes_count_cubit/notes_count_cubit.dart';
 import 'package:scribble/src/features/notes/domain/usecase/restore_notes_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/update_note_usecase.dart';
 import 'src/features/todos/presentation/bloc/todos_bloc/todos_bloc.dart';
@@ -90,6 +92,14 @@ class MyApp extends StatelessWidget {
               settingsCubit: settingsCubit,
             )..add(LoadNotesEvent(sortByModifiedDate: sortByModifiedDate));
           },
+        ),
+
+        // Notes Count Cubit - tracks Notes/Archived/Bookmarks counts for the drawer
+        BlocProvider(
+          create: (context) => NotesCountCubit(
+            getNotesCountUseCase: GetNotesCountUseCase(repo),
+            notesBloc: context.read<NotesBloc>(),
+          ),
         ),
 
         // Todos Bloc
