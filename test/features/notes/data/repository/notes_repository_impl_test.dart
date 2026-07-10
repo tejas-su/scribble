@@ -21,6 +21,7 @@ void main() {
     modifiedAt: '2026-01-01',
     createdAt: '2026-01-01',
     isBookMarked: false,
+    isPinned: false,
     isArchived: false,
     isDeleted: false,
     isReadOnly: false,
@@ -94,6 +95,18 @@ void main() {
     when(() => service.unbookmarkNote(any())).thenAnswer((_) async => 1);
     await repository.unbookmarkNote(5);
     verify(() => service.unbookmarkNote(5)).called(1);
+  });
+
+  test('pinNote forwards the id', () async {
+    when(() => service.pinNote(any())).thenAnswer((_) async => 1);
+    await repository.pinNote(5);
+    verify(() => service.pinNote(5)).called(1);
+  });
+
+  test('unpinNote forwards the id', () async {
+    when(() => service.unpinNote(any())).thenAnswer((_) async => 1);
+    await repository.unpinNote(5);
+    verify(() => service.unpinNote(5)).called(1);
   });
 
   test('makeNoteReadOnly forwards the id', () async {

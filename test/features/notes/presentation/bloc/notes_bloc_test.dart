@@ -12,6 +12,7 @@ import 'package:scribble/src/features/notes/domain/usecase/bookmark_note_usecase
 import 'package:scribble/src/features/notes/domain/usecase/delete_all_notes_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/delete_note_permanently_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/get_notes_usecase.dart';
+import 'package:scribble/src/features/notes/domain/usecase/pin_note_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/read_write_access_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/restore_notes_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/soft_delete_note_usecase.dart';
@@ -36,6 +37,7 @@ const testNote = Note(
   modifiedAt: '2026-01-02',
   createdAt: '2026-01-01',
   isBookMarked: false,
+  isPinned: false,
   isArchived: false,
   isDeleted: false,
   isReadOnly: false,
@@ -119,6 +121,7 @@ void main() {
       deleteNotePermanentlyUseCase: DeleteNotePermanentlyUseCase(repository),
       getNotesUseCase: GetNotesUseCase(repository),
       bookmarkNoteUseCase: BookmarkNoteUseCase(repository),
+      pinNoteUseCase: PinNoteUseCase(repository),
       archiveNotesUseCase: ArchiveNotesUseCase(repository),
       restoreNotesUseCase: RestoreNotesUseCase(repository),
       deleteAllNotesUseCase: DeleteAllNotesUseCase(repository),
@@ -344,6 +347,36 @@ void main() {
       await unbookmarked.future;
 
       verify(() => repository.unbookmarkNote(1)).called(1);
+    });
+  });
+
+  group('PinNotesEvent', () {
+    test('pin: true calls pinNote and reloads', () async {
+      await bootstrapDefaultLoaded([testNote]);
+      final pinned = Completer<void>();
+      when(() => repository.pinNote(any())).thenAnswer((_) async {
+        pinned.complete();
+      });
+      stubGetNotes([testNote]);
+
+      bloc.add(const PinNotesEvent(id: 1, pin: true));
+      await pinned.future;
+
+      verify(() => repository.pinNote(1)).called(1);
+    });
+
+    test('pin: false calls unpinNote and reloads', () async {
+      await bootstrapDefaultLoaded([testNote]);
+      final unpinned = Completer<void>();
+      when(() => repository.unpinNote(any())).thenAnswer((_) async {
+        unpinned.complete();
+      });
+      stubGetNotes([testNote]);
+
+      bloc.add(const PinNotesEvent(id: 1, pin: false));
+      await unpinned.future;
+
+      verify(() => repository.unpinNote(1)).called(1);
     });
   });
 

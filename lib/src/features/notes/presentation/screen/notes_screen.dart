@@ -285,6 +285,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                                   isDeletedNote:
                                                       state.isDeleted,
                                                   context: context,
+                                                  isPinned: note.isPinned,
                                                   rect: RelativeRect.fromLTRB(
                                                     tapPosition!.dx,
                                                     tapPosition!.dy,
@@ -341,6 +342,17 @@ class _NotesScreenState extends State<NotesScreen> {
                                                           ),
                                                         );
                                                   },
+                                                  onPin: () {
+                                                    context
+                                                        .read<NotesBloc>()
+                                                        .add(
+                                                          PinNotesEvent(
+                                                            id: note.id!,
+                                                            pin: !note
+                                                                .isPinned,
+                                                          ),
+                                                        );
+                                                  },
                                                   onShare: () async {
                                                     await shareNote(
                                                       title: note.title,
@@ -364,9 +376,11 @@ class _NotesScreenState extends State<NotesScreen> {
                                                         ),
                                                       );
                                                     },
-                                              icon: note.isBookMarked
-                                                  ? Icons.bookmark_rounded
-                                                  : null,
+                                              icon: note.isPinned
+                                                  ? Icons.push_pin_rounded
+                                                  : (note.isBookMarked
+                                                        ? Icons.bookmark_rounded
+                                                        : null),
                                               date: note.modifiedAt,
                                               title: note.title,
                                               content: note.content,

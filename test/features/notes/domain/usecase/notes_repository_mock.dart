@@ -12,6 +12,7 @@ const testNote = Note(
   modifiedAt: '2026-01-01',
   createdAt: '2026-01-01',
   isBookMarked: false,
+  isPinned: false,
   isArchived: false,
   isDeleted: false,
   isReadOnly: false,

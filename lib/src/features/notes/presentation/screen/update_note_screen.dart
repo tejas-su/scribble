@@ -66,6 +66,7 @@ class _UpdateNotesScreenState extends State<UpdateNotesScreen> {
               createdAt: widget.note.createdAt,
               content: contentController.text,
               isBookMarked: isBookMarked.value,
+              isPinned: widget.note.isPinned,
               isReadOnly: readOnlyNotifier.value,
             );
             context.read<NotesBloc>().add(

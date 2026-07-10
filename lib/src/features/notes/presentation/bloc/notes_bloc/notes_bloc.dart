@@ -9,6 +9,7 @@ import 'package:scribble/src/features/notes/data/services/sqflite_notes_database
 import 'package:scribble/src/features/notes/domain/enitities/note.dart';
 import 'package:scribble/src/features/notes/domain/usecase/add_note_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/bookmark_note_usecase.dart';
+import 'package:scribble/src/features/notes/domain/usecase/pin_note_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/soft_delete_note_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/delete_note_permanently_usecase.dart';
 import 'package:scribble/src/features/notes/domain/usecase/get_notes_usecase.dart';
@@ -28,6 +29,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
   final DeleteNotePermanentlyUseCase deleteNotePermanentlyUseCase;
   final GetNotesUseCase getNotesUseCase;
   final BookmarkNoteUseCase bookmarkNoteUseCase;
+  final PinNoteUseCase pinNoteUseCase;
   final ArchiveNotesUseCase archiveNotesUseCase;
   final RestoreNotesUseCase restoreNotesUseCase;
   final DeleteAllNotesUseCase deleteAllNotesUseCase;
@@ -47,6 +49,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     required this.deleteNotePermanentlyUseCase,
     required this.getNotesUseCase,
     required this.bookmarkNoteUseCase,
+    required this.pinNoteUseCase,
     required this.archiveNotesUseCase,
     required this.restoreNotesUseCase,
     required this.deleteAllNotesUseCase,
@@ -59,6 +62,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     on<UpdateNotesEvent>(_onUpdateNotes);
     on<DeleteAllNotesevent>(_deleteAllNotes);
     on<BookmarkNotesEvent>(_onBookmarkNotes);
+    on<PinNotesEvent>(_onPinNotes);
     on<SearchNotesEvent>(_onSearchNotes, transformer: _searchNotesTransformer);
     on<LoadMoreNotesEvent>(_onLoadMoreNotes);
     on<LoadDeletedNotesEvent>(_onLoadDeletedNotes);
@@ -91,6 +95,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
                 modifiedAt: note.date,
                 createdAt: note.date,
                 isBookMarked: note.isBookmarked,
+                isPinned: false,
                 isArchived: false,
                 isDeleted: false,
                 isReadOnly: false,
@@ -179,6 +184,19 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
   ) async {
     try {
       await bookmarkNoteUseCase(id: event.id, bookMark: event.bookMark);
+      await _reloadCurrentView(emit);
+    } catch (e) {
+      emit(NotesErrorState(errorMessage: e.toString()));
+    }
+  }
+
+  //Pin the notes
+  FutureOr<void> _onPinNotes(
+    PinNotesEvent event,
+    Emitter<NotesState> emit,
+  ) async {
+    try {
+      await pinNoteUseCase(id: event.id, pin: event.pin);
       await _reloadCurrentView(emit);
     } catch (e) {
       emit(NotesErrorState(errorMessage: e.toString()));
