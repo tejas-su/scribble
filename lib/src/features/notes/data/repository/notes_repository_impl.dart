@@ -80,6 +80,23 @@ class NotesRepositoryImpl implements NotesRepository {
   }
 
   @override
+  Future<int> getNotesCount({
+    bool onlyBookmarked = false,
+    bool onlyDeleted = false,
+    bool onlyArchived = false,
+  }) async {
+    try {
+      return await _sqfliteNotesDatabaseService.getNotesCount(
+        onlyBookmarked: onlyBookmarked,
+        onlyDeleted: onlyDeleted,
+        onlyArchived: onlyArchived,
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
   Future<void> updateNote(int id, Note note) async {
     try {
       await _sqfliteNotesDatabaseService.updateNote(

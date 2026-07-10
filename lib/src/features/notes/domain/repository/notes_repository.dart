@@ -44,4 +44,11 @@ abstract class NotesRepository {
     int limit = 20,
     int offset = 0,
   });
+
+  /// Get the count of notes matching the given filters
+  Future<int> getNotesCount({
+    bool onlyBookmarked = false,
+    bool onlyDeleted = false,
+    bool onlyArchived = false,
+  });
 }
